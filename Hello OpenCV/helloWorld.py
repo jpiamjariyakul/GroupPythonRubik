@@ -42,10 +42,28 @@ def main():
 
         # Operations on frame here
         # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # Converts color-space from BGR to HSV
+        frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # Defines boundaries in HSV for the color blue
+        # blue_lower = np.array([110, 50, 50])
+        # blue_upper = np.array([130, 255, 255])
+
+        # In OpenCV, range is [179, 255, 255]
+
+        # Defines boundaries in HSV for the color blue
+        blue_lower = np.array([50, 100, 100])
+        blue_upper = np.array([70, 255, 255])
+
+        # Sets threshold to the HSV image - obtains only blue colors
+        mask_blue = cv2.inRange(frame_hsv, blue_lower, blue_upper)
+
+        # Applies a bitwise-AND operation on the mask and original image
+        result_blue = cv2.bitwise_and(frame, frame , mask=mask_blue)
 
         # Displays frame
-        cv2.imshow("Video Frame", frame)
+        cv2.imshow("Video Frame", result_blue)
 
         # Recognises keystroke
         keystroke = cv2.waitKey(1) & 0xFF
