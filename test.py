@@ -3,8 +3,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from datetime import datetime
 
+# Creates a window; cv2.imshow loads video into it
 cv2.namedWindow("Video Frame - Original", cv2.WINDOW_NORMAL)
-# ^This creates a window, and cv2.imshow loads the video into it. It is only for resizing purposes. Works perfectly without
+# Only for resizing purposes; can operate without
 
 # Uses MatPlotLib for showing images
 def showImage(img, title):
