@@ -59,14 +59,14 @@ def main():
         white_upper = np.array([179, 20, 255])
         # Defines boundaries in HSV for the color red
         red_lower = np.array([0, 128, 128])
-        red_upper = np.array([7, 255, 255])
+        red_upper = np.array([9, 255, 255])
         # red_lower = np.array([151, 128, 128])
         # red_upper = np.array([180, 255, 255])
         # Defines boundaries in HSV for the color orange
         orange_lower = np.array([10, 128, 128])
         orange_upper = np.array([15, 255, 255])
         # Defines boundaries in HSV for the color yellow
-        yellow_lower = np.array([16, 128, 128])
+        yellow_lower = np.array([25, 128, 128])
         yellow_upper = np.array([45, 255, 255])
         # Defines boundaries in HSV for the color green
         green_lower = np.array([46, 128, 128])
