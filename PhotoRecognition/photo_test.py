@@ -4,12 +4,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from datetime import datetime
 
+
+### Declares faces visible to camera & to be analysed
 # Takes assumption that faces are labelled per following convention
 '''
 [			UP				]
 [	LEFT	]	[   FRONT	]
 '''
-
 # Declares 3x3 tuple for storing pixel coordinates of face UP
 coord_up =  (	
                 (	( 96,	 96),	(123,	 86),	(148,	 76)	),
