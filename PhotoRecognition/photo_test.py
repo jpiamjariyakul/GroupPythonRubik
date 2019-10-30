@@ -192,10 +192,11 @@ def main():
 		cubelets = []
 		# Loop to fill all rows/columns
 		for face in range(3):
-			cubelets.append([])
+			cubelets.append([]) # Creates superlist for faces
 			for row in range(3):
-				cubelets[face].append([])
+				cubelets[face].append([]) # Creates sublist for rows
 				for column in range(3):
+					# Uses a 'switch' statement - defines color of filtered image by matching with masked colors
 					if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
 						cubelets[face][row].append("W")
 					elif np.any(result_final[coord_yx[face][row][column]] == result_red[coord_yx[face][row][column]]):
