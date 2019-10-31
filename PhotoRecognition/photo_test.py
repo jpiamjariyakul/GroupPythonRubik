@@ -1,8 +1,8 @@
 ### Imports prerequisites & libraries
 import cv2
 import numpy as np
-from matplotlib import pyplot as plt
-from datetime import datetime
+#from matplotlib import pyplot as plt
+#from datetime import datetime
 
 
 ### Declares faces visible to camera & to be analysed
@@ -17,6 +17,10 @@ from datetime import datetime
 [1,0][1,1][1,2]
 [2,0][2,1][2,2]
 '''
+# NOTE:	Color system in program runs in white-red-orange-yellow-green-blue
+# 		Any n-dimensional lists involving color may cycle through these in order
+#		IE mask[0] is for 
+
 
 '''
 # Tuple storing pixels to check in image
@@ -140,6 +144,7 @@ def main():
 		result_white = cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_white)
 		result_white = cv2.resize(mask_white, (300, 300))
 		'''
+
 		result_white = 	cv2.resize(
 							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_white),
 							(300, 300)
@@ -164,30 +169,10 @@ def main():
 							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_blue),
 							(300, 300)
 						)
+		result_combined = result_white + result_red + result_orange + result_yellow + result_green + result_blue
+		
 		# Displays image/video in frame
 		cv2.imshow("Frame", result_final)
-
-		#result_combined = result_white + result_red + result_orange + result_yellow + result_green + result_blue
-		#mask_test = mask_white_scaled + mask_red_scaled + result_final
-
-		#print("Coord: " + str(coord_yx[2][1][2]))
-		#print("Final Val at " + str(coord_yx[2][1][2]) + ": " + str(result_final[coord_yx[2][1][2]]))
-		#print("Combo Val at " + str(coord_yx[2][1][2]) + ": " + str(result_combined[coord_yx[2][1][2]]))
-		#if np.any(result_final[coord_yx[2][1][2]] != 0):
-		#	print("the pixel is not black")
-		#else:
-		#	print("pixel is black")
-
-		#print("Blue: " + str(result_blue[coord_yx[2][1][2]]))
-		#print("White: " + str(result_white[coord_yx[2][1][2]]))
-
-		# if np.any(result_final[coord_yx[2][1][2]] == result_blue[coord_yx[2][1][2]]):
-		# 	print("At " + str(coord_yx[2][1][2]) + " colur is blue")
-		# elif np.any(result_final[coord_yx[2][1][2]] == result_white[coord_yx[2][1][2]]):
-		# 	print("At " + str(coord_yx[2][1][2]) + " colur is white")
-		# else:
-		# 	print("Undetected - check again!!")
-
 		# Defines individual faces & cubelets
 		cubelets = []
 		# Loop to fill all rows/columns
@@ -196,23 +181,30 @@ def main():
 			for row in range(3):
 				cubelets[face].append([]) # Creates sublist for rows
 				for column in range(3):
+					#print("Coord at (" + str(face) + ", " + str(row) + ", " + str(column) + "): " + str(coord_yx[face][row][column]))
+					# Default value for undefined/black colors - INVALID INPUT
+					tempFace = "U"
 					# Uses a 'switch' statement - defines color of filtered image by matching with masked colors
-					if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
-						cubelets[face][row].append("W")
-					elif np.any(result_final[coord_yx[face][row][column]] == result_red[coord_yx[face][row][column]]):
-						cubelets[face][row].append("R")
-					elif np.any(result_final[coord_yx[face][row][column]] == result_orange[coord_yx[face][row][column]]):
-						cubelets[face][row].append("O")
-					elif np.any(result_final[coord_yx[face][row][column]] == result_yellow[coord_yx[face][row][column]]):
-						cubelets[face][row].append("Y")
-					elif np.any(result_final[coord_yx[face][row][column]] == result_green[coord_yx[face][row][column]]):
-						cubelets[face][row].append("G")
-					elif np.any(result_final[coord_yx[face][row][column]] == result_blue[coord_yx[face][row][column]]):
-						cubelets[face][row].append("B")
-					else:
-						cubelets[face][row].append("?")
-
-		print(cubelets)
+					# TODO: Find more efficient methods to validating valid colors and/or fallback values
+					# Only passes if color is defined per WROYGB
+					if np.any(result_final[coord_yx[face][row][column]] != 0):
+						# TODO: Check why initial value becomes fallback val - unintentional!!
+						if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
+							tempFace = "W"
+						elif np.any(result_final[coord_yx[face][row][column]] == result_red[coord_yx[face][row][column]]):
+							tempFace = "R"
+						elif np.any(result_final[coord_yx[face][row][column]] == result_orange[coord_yx[face][row][column]]):
+							tempFace = "O"
+						elif np.any(result_final[coord_yx[face][row][column]] == result_yellow[coord_yx[face][row][column]]):
+							tempFace = "Y"
+						elif np.any(result_final[coord_yx[face][row][column]] == result_green[coord_yx[face][row][column]]):
+							tempFace = "G"
+						elif np.any(result_final[coord_yx[face][row][column]] == result_blue[coord_yx[face][row][column]]):
+							tempFace = "B"
+					cubelets[face][row].append(tempFace)
+		print(str(cubelets[0][0]) + " | " + str(cubelets[1][0]) + " | " + str(cubelets[2][0]))
+		print(str(cubelets[0][1]) + " | " + str(cubelets[1][1]) + " | " + str(cubelets[2][2]))
+		print(str(cubelets[0][2]) + " | " + str(cubelets[1][2]) + " | " + str(cubelets[2][2]))
 
 		# Recognises keystroke
 		keystroke = cv2.waitKey(0) & 0xFF
