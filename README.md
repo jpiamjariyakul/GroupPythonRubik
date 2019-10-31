@@ -1,6 +1,9 @@
 # Rubik's Cube Analyser/Solver
 A collection of Python projects & gists leading to its usage in the Rubik's Cube solving robot
+
 Utilises image processing/recognition & implementing solving algorithms
+
+Working code is in directory "PhotoRecognition"
 
 ## Dependencies
 ### Physical
