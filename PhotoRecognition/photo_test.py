@@ -66,32 +66,65 @@ coord_yx = (
 def nothing(x):
     pass
 
-def checkColor():
+# Defines color at coordinates given
+def checkColor(	y, x, c_combined,
+				c_white, c_red, c_orange,
+				c_yellow, c_green, c_blue):
 	# TODO: Check why initial value becomes fallback val - unintentional!!
-	if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
-		tempFace = "W"
-	elif np.any(result_final[coord_yx[face][row][column]] == result_red[coord_yx[face][row][column]]):
-		tempFace = "R"
-	elif np.any(result_final[coord_yx[face][row][column]] == result_orange[coord_yx[face][row][column]]):
-		tempFace = "O"
-	elif np.any(result_final[coord_yx[face][row][column]] == result_yellow[coord_yx[face][row][column]]):
-		tempFace = "Y"
-	elif np.any(result_final[coord_yx[face][row][column]] == result_green[coord_yx[face][row][column]]):
-		tempFace = "G"
-	elif np.any(result_final[coord_yx[face][row][column]] == result_blue[coord_yx[face][row][column]]):
-		tempFace = "B"
+	if np.any(c_combined[y][x] == c_blue[y][x]):
+		return "B"
+	elif np.any(c_combined[y][x] == c_white[y][x]):
+		return "W"
+	elif np.any(c_combined[y][x] == c_red[y][x]):
+		return "R"
+	elif np.any(c_combined[y][x] == c_orange[y][x]):
+		return "O"
+	elif np.any(c_combined[y][x] == c_yellow[y][x]):
+		return "Y"
+	elif np.any(c_combined[y][x] == c_green[y][x]):
+		return "G"
 
-# Verifies color at pixel & its surroundings
-def checkValid(	face, row, column,
-				color_combined,
-				result_white, result_red, result_orange,
-				result_yellow, result_green, result_blue):
-	isValid = False
-	while (isValid = False):
-		for i in range(3):
-			if np.any(result_final[coord_yx[face][row][column]] != 0):
-				
-	return tempFace
+# Verifies color at pixel & its surroundings whether it's black or otherwise
+def verifyColor(	face, row, column, c_combined,
+					c_white, c_red, c_orange,
+					c_yellow, c_green, c_blue):
+	coord_row, coord_col = coord_yx[face][row][column][0], coord_yx[face][row][column][1]
+	print("XY [" + str(face) + " " + str(row) + " " + str(column) + "]: (" + str(coord_row) + ", " + str(coord_col) + ")")
+	print("Found on first attempt: " + str(np.any(c_combined[coord_row][coord_col] != 0)))
+	# Check if at specified coords there are colors
+	if np.any(c_combined[coord_row][coord_col] != 0):
+		color = checkColor(	coord_row, coord_col, \
+							c_combined, \
+							c_white, c_red, c_orange, \
+							c_yellow, c_green, c_blue)
+		print("Color at (" + str(coord_row) + ", " + str(coord_col) + "): " + str(color))
+		print("------------------------")
+	else: # Otherwise, iterate through 2 layers	until color found, or error
+		layerMax = 3 # Max number of iterational layers to expand from original point
+		i = j = -1 * layerMax
+		i_initial = i
+		while (True):
+			print(i)
+			if np.any(c_combined[coord_row + j][coord_col + i] != 0) and (i != 0) and (j != 0):
+				color = checkColor(	(coord_row + j), (coord_col + i), \
+									c_combined, \
+									c_white, c_red, c_orange, \
+									c_yellow, c_green, c_blue)
+				print("Color at (" + str(coord_row + j) + ", " + str(coord_col + i) + "): " + str(color))
+				print("------------------------")
+				break
+			else:
+				print("!!! - Invalid color at " + str(coord_row + j) + ", " + str(coord_col + i) + " - adding range")
+				if i >= layerMax:
+					i = i_initial
+					j += 1
+				else: i += 1
+				if j >= layerMax:
+					color = "U"
+					print("ERROR - color undefined")
+					print("------------------------")
+					break
+	return color
 
 
 # Creates a resizable window frame - one loads video/image into it
@@ -100,12 +133,11 @@ cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
 
 def main():
 	# Captures frame-by-frame
-	frame = cv2.imread("image_02.jpg", cv2.IMREAD_COLOR)
+	frame = cv2.imread("image_01.jpg", cv2.IMREAD_COLOR)
 
 	# Gaussian filter is applied to captured image - remove noises
 	image_gaussian = cv2.GaussianBlur(frame, (5, 5), 0)
 
-	
 	# Converts color-space from BGR to HSV
 	frame_hsv = cv2.cvtColor(image_gaussian, cv2.COLOR_BGR2HSV)
 
@@ -146,6 +178,56 @@ def main():
 
 	# Finds contours of image
 	contours, _ = cv2.findContours(mask_combined, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	
+	# Applies a bitwise-AND operation on the combined mask and original (blurred) image
+	result_final = cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_combined)
+	# Resize image to normalised size, i.e. 300x300
+	result_final = cv2.resize(result_final, (300, 300))
+	# This allows for a normalised coordinate system afterwards
+	# Such will be used during detecting each facelets, per each point in image
+
+	# Resizes previous individual masks to allow color checking
+	result_white = 	cv2.resize(
+						cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_white),
+						(300, 300)
+					)
+	result_red = 	cv2.resize(
+						cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_red),
+						(300, 300)
+					)
+	result_orange = cv2.resize(
+						cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_orange),
+						(300, 300)
+					)
+	result_yellow = cv2.resize(
+						cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_yellow),
+						(300, 300)
+					)
+	result_green = 	cv2.resize(
+						cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_green),
+						(300, 300)
+					)
+	result_blue = 	cv2.resize(
+						cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_blue),
+						(300, 300)
+					)
+	result_combined = result_white + result_red + result_orange + result_yellow + result_green + result_blue
+
+	# Defines individual faces & cubelets
+	cubelets = []
+	# Loop to fill all rows/columns
+	for face in range(3):
+		cubelets.append([]) # Creates superlist for faces
+		for row in range(3):
+			cubelets[face].append([]) # Creates sublist for rows
+			for column in range(3):
+				cubelets[face][row].append(verifyColor(	face, row, column, result_final,
+														result_white, result_red, result_orange,
+														result_yellow, result_green, result_blue
+														))
+	print(str(cubelets[0][0]) + " | " + str(cubelets[1][0]) + " | " + str(cubelets[2][0]))
+	print(str(cubelets[0][1]) + " | " + str(cubelets[1][1]) + " | " + str(cubelets[2][1]))
+	print(str(cubelets[0][2]) + " | " + str(cubelets[1][2]) + " | " + str(cubelets[2][2]))
 
 	while(True):
 		'''
@@ -158,91 +240,9 @@ def main():
 			if area > 500:
 				cv2.drawContours(image_gaussian, [count], 0, (0, 255, 0), 2)
 		'''
-
-		# Applies a bitwise-AND operation on the combined mask and original (blurred) image
-		result_final = cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_combined)
-		# Resize image to normalised size, i.e. 300x300
-		result_final = cv2.resize(result_final, (300, 300))
-		# This allows for a normalised coordinate system afterwards
-		# Such will be used during detecting each facelets, per each point in image
-
-		# Resizes previous individual masks to allow color checking
-		'''
-		result_white = cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_white)
-		result_white = cv2.resize(mask_white, (300, 300))
-		'''
-
-		result_white = 	cv2.resize(
-							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_white),
-							(300, 300)
-						)
-		result_red = 	cv2.resize(
-							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_red),
-							(300, 300)
-						)
-		result_orange = cv2.resize(
-							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_orange),
-							(300, 300)
-						)
-		result_yellow = cv2.resize(
-							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_yellow),
-							(300, 300)
-						)
-		result_green = 	cv2.resize(
-							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_green),
-							(300, 300)
-						)
-		result_blue = 	cv2.resize(
-							cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_blue),
-							(300, 300)
-						)
-		result_combined = result_white + result_red + result_orange + result_yellow + result_green + result_blue
-		
 		# Displays image/video in frame
 		cv2.imshow("Frame", result_final)
-		# Defines individual faces & cubelets
-		cubelets = []
-		# Loop to fill all rows/columns
-		for face in range(3):
-			cubelets.append([]) # Creates superlist for faces
-			for row in range(3):
-				cubelets[face].append([]) # Creates sublist for rows
-				for column in range(3):
-					#print("Coord at (" + str(face) + ", " + str(row) + ", " + str(column) + "): " + str(coord_yx[face][row][column]))
-					# Default value for undefined/black colors - INVALID INPUT
-					# Uses a 'switch' statement - defines color of filtered image by matching with masked colors
-					# TODO: Find more efficient methods to validating valid colors and/or fallback values
-					# Only passes if color is defined per WROYGB
-					'''
-					if np.any(result_final[coord_yx[face][row][column]] != 0):
-						# TODO: Check why initial value becomes fallback val - unintentional!!
-						if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
-							tempFace = "W"
-						elif np.any(result_final[coord_yx[face][row][column]] == result_red[coord_yx[face][row][column]]):
-							tempFace = "R"
-						elif np.any(result_final[coord_yx[face][row][column]] == result_orange[coord_yx[face][row][column]]):
-							tempFace = "O"
-						elif np.any(result_final[coord_yx[face][row][column]] == result_yellow[coord_yx[face][row][column]]):
-							tempFace = "Y"
-						elif np.any(result_final[coord_yx[face][row][column]] == result_green[coord_yx[face][row][column]]):
-							tempFace = "G"
-						elif np.any(result_final[coord_yx[face][row][column]] == result_blue[coord_yx[face][row][column]]):
-							tempFace = "B"
-						# else:
-						# 	tempFace = "U"
-					else:
-						tempFace = "U"
-					cubelets[face][row].append(tempFace)
-					'''
-					cubelets[face][row].append(checkValid(	face, row, column,
-															result_final,
-															result_white, result_red, result_orange,
-															result_yellow, result_green, result_blue
-															))
-		print(str(cubelets[0][0]) + " | " + str(cubelets[1][0]) + " | " + str(cubelets[2][0]))
-		print(str(cubelets[0][1]) + " | " + str(cubelets[1][1]) + " | " + str(cubelets[2][2]))
-		print(str(cubelets[0][2]) + " | " + str(cubelets[1][2]) + " | " + str(cubelets[2][2]))
-
+		
 		# Recognises keystroke
 		keystroke = cv2.waitKey(0) & 0xFF
 		#if keystroke == 27: # wait for ESC key to exit
