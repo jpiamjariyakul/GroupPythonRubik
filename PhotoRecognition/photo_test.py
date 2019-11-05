@@ -104,7 +104,6 @@ def verifyColor(	face, row, column, c_combined,
 		i = j = -1 * layerMax
 		i_initial = i
 		while (True):
-			print(i)
 			if np.any(c_combined[coord_row + j][coord_col + i] != 0) and (i != 0) and (j != 0):
 				color = checkColor(	(coord_row + j), (coord_col + i), \
 									c_combined, \
