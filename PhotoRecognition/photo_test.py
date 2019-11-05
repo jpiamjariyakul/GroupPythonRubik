@@ -66,10 +66,37 @@ coord_yx = (
 def nothing(x):
     pass
 
+def checkColor():
+	# TODO: Check why initial value becomes fallback val - unintentional!!
+	if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
+		tempFace = "W"
+	elif np.any(result_final[coord_yx[face][row][column]] == result_red[coord_yx[face][row][column]]):
+		tempFace = "R"
+	elif np.any(result_final[coord_yx[face][row][column]] == result_orange[coord_yx[face][row][column]]):
+		tempFace = "O"
+	elif np.any(result_final[coord_yx[face][row][column]] == result_yellow[coord_yx[face][row][column]]):
+		tempFace = "Y"
+	elif np.any(result_final[coord_yx[face][row][column]] == result_green[coord_yx[face][row][column]]):
+		tempFace = "G"
+	elif np.any(result_final[coord_yx[face][row][column]] == result_blue[coord_yx[face][row][column]]):
+		tempFace = "B"
+
+# Verifies color at pixel & its surroundings
+def checkValid(	face, row, column,
+				color_combined,
+				result_white, result_red, result_orange,
+				result_yellow, result_green, result_blue):
+	isValid = False
+	while (isValid = False):
+		for i in range(3):
+			if np.any(result_final[coord_yx[face][row][column]] != 0):
+				
+	return tempFace
+
+
 # Creates a resizable window frame - one loads video/image into it
 cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
 # Program functions perfectly normal w/out line in
-
 
 def main():
 	# Captures frame-by-frame
@@ -183,10 +210,10 @@ def main():
 				for column in range(3):
 					#print("Coord at (" + str(face) + ", " + str(row) + ", " + str(column) + "): " + str(coord_yx[face][row][column]))
 					# Default value for undefined/black colors - INVALID INPUT
-					tempFace = "U"
 					# Uses a 'switch' statement - defines color of filtered image by matching with masked colors
 					# TODO: Find more efficient methods to validating valid colors and/or fallback values
 					# Only passes if color is defined per WROYGB
+					'''
 					if np.any(result_final[coord_yx[face][row][column]] != 0):
 						# TODO: Check why initial value becomes fallback val - unintentional!!
 						if np.any(result_final[coord_yx[face][row][column]] == result_white[coord_yx[face][row][column]]):
@@ -201,7 +228,17 @@ def main():
 							tempFace = "G"
 						elif np.any(result_final[coord_yx[face][row][column]] == result_blue[coord_yx[face][row][column]]):
 							tempFace = "B"
+						# else:
+						# 	tempFace = "U"
+					else:
+						tempFace = "U"
 					cubelets[face][row].append(tempFace)
+					'''
+					cubelets[face][row].append(checkValid(	face, row, column,
+															result_final,
+															result_white, result_red, result_orange,
+															result_yellow, result_green, result_blue
+															))
 		print(str(cubelets[0][0]) + " | " + str(cubelets[1][0]) + " | " + str(cubelets[2][0]))
 		print(str(cubelets[0][1]) + " | " + str(cubelets[1][1]) + " | " + str(cubelets[2][2]))
 		print(str(cubelets[0][2]) + " | " + str(cubelets[1][2]) + " | " + str(cubelets[2][2]))
