@@ -67,21 +67,21 @@ def nothing(x):
     pass
 
 # Defines color at coordinates given
-def checkColor(	y, x, c_combined,
-				c_white, c_red, c_orange,
-				c_yellow, c_green, c_blue):
-	# TODO: Check why initial value becomes fallback val - unintentional!!
-	if np.any(c_combined[y][x] == c_blue[y][x]):
+def checkColor(	hsv_combined,
+				hsv_white, hsv_red, hsv_orange,
+				hsv_yellow, hsv_green, hsv_blue):
+	# Only uses array values & not the images themselves
+	if np.any(hsv_combined == hsv_blue):
 		return "B"
-	elif np.any(c_combined[y][x] == c_white[y][x]):
+	elif np.any(hsv_combined == hsv_white):
 		return "W"
-	elif np.any(c_combined[y][x] == c_red[y][x]):
+	elif np.any(hsv_combined == hsv_red):
 		return "R"
-	elif np.any(c_combined[y][x] == c_orange[y][x]):
+	elif np.any(hsv_combined == hsv_orange):
 		return "O"
-	elif np.any(c_combined[y][x] == c_yellow[y][x]):
+	elif np.any(hsv_combined == hsv_yellow):
 		return "Y"
-	elif np.any(c_combined[y][x] == c_green[y][x]):
+	elif np.any(hsv_combined == hsv_green):
 		return "G"
 
 # Verifies color at pixel & its surroundings whether it's black or otherwise
@@ -93,10 +93,18 @@ def verifyColor(	face, row, column, c_combined,
 	print("Found on first attempt: " + str(np.any(c_combined[coord_row][coord_col] != 0)))
 	# Check if at specified coords there are colors
 	if np.any(c_combined[coord_row][coord_col] != 0):
-		color = checkColor(	coord_row, coord_col, \
-							c_combined, \
-							c_white, c_red, c_orange, \
-							c_yellow, c_green, c_blue)
+		# color = checkColor(	(coord_row + j), (coord_col + i), \
+		# 							c_combined, \
+		# 							c_white, c_red, c_orange, \
+		# 							c_yellow, c_green, c_blue)
+		# Passes HSV values instead of the images
+		color = checkColor(	c_combined[coord_row][coord_col],	\
+							c_white[coord_row][coord_col], 		\
+							c_red[coord_row][coord_col], 		\
+							c_orange[coord_row][coord_col], 	\
+							c_yellow[coord_row][coord_col], 	\
+							c_green[coord_row][coord_col], 		\
+							c_blue[coord_row][coord_col])
 		print("Color at (" + str(coord_row) + ", " + str(coord_col) + "): " + str(color))
 		print("------------------------")
 	else: # Otherwise, iterate through 2 layers	until color found, or error
@@ -105,10 +113,13 @@ def verifyColor(	face, row, column, c_combined,
 		i_initial = i
 		while (True):
 			if np.any(c_combined[coord_row + j][coord_col + i] != 0) and (i != 0) and (j != 0):
-				color = checkColor(	(coord_row + j), (coord_col + i), \
-									c_combined, \
-									c_white, c_red, c_orange, \
-									c_yellow, c_green, c_blue)
+				color = checkColor(	c_combined[coord_row + j][coord_col + i],	\
+									c_white[coord_row + j][coord_col + i], 		\
+									c_red[coord_row + j][coord_col + i], 		\
+									c_orange[coord_row + j][coord_col + i], 	\
+									c_yellow[coord_row + j][coord_col + i], 	\
+									c_green[coord_row + j][coord_col + i], 		\
+									c_blue[coord_row + j][coord_col + i])
 				print("Color at (" + str(coord_row + j) + ", " + str(coord_col + i) + "): " + str(color))
 				print("------------------------")
 				break
@@ -132,7 +143,7 @@ cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
 
 def main():
 	# Captures frame-by-frame
-	frame = cv2.imread("image_01.jpg", cv2.IMREAD_COLOR)
+	frame = cv2.imread("image_02.jpg", cv2.IMREAD_COLOR)
 
 	# Gaussian filter is applied to captured image - remove noises
 	image_gaussian = cv2.GaussianBlur(frame, (5, 5), 0)
