@@ -235,8 +235,7 @@ def main():
 				cv2.drawContours(image_gaussian, [count], 0, (0, 255, 0), 2)
 		'''
 		# Displays image/video in frame
-		cv2.imshow("Frame", result_final)
-		
+		cv2.imshow("Frame", result_orange)
 		# Recognises keystroke
 		keystroke = cv2.waitKey(0) & 0xFF
 		#if keystroke == 27: # wait for ESC key to exit
