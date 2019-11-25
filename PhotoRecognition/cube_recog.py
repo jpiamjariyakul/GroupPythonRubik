@@ -169,7 +169,7 @@ def main():
 	mask_combined = cv2.erode(mask_combined,  kernel)
 
 	# Finds contours of image
-	contours, _ = cv2.findContours(mask_combined, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	#contours, _ = cv2.findContours(mask_combined, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 	
 	# Applies a bitwise-AND operation on the combined mask and original (blurred) image
 	result_final = cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_combined)
@@ -235,7 +235,7 @@ def main():
 				cv2.drawContours(image_gaussian, [count], 0, (0, 255, 0), 2)
 		'''
 		# Displays image/video in frame
-		cv2.imshow("Frame", result_orange)
+		cv2.imshow("Frame", result_final)
 		# Recognises keystroke
 		keystroke = cv2.waitKey(0) & 0xFF
 		#if keystroke == 27: # wait for ESC key to exit
