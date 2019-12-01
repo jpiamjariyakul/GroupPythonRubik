@@ -4,9 +4,22 @@ import numpy as np
 # Tuple storing pixels to check in image - amended later to accommodate rig
 # NB: OpenCV uses a (Y,X) coordinate system
 # Concerns interim submision - detects only one face
+
+'''
 coord_yx =  (	(100,	100),	(100, 	150),	(100, 	200)	),\
 			(	(150,	100),	(150,	150),	(150,	200)	),\
 			(	(200,	100),	(200,	150),	(200,	200)	)
+'''
+
+# New coords given following arrangement - read as vertical
+'''
+	X | Y - Y		[X, X, X],
+	X | Y - Y	=>	[Y, Y, Y],
+	X | Y - Y		[Y, Y, Y]
+'''
+coord_yx =  (	(200, 	100),	(150, 	100),	(100, 	100)	),\
+			(	(200, 	150),	(150,	150),	(100,	150)	),\
+			(	(200,	200),	(150,	200),	(100,	200)	)
 
 # Defines color at coordinates given
 def checkColor(	hsv_combined,

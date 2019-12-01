@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import color
 import audio
+import solving
 
 # Creates a resizable window frame - one loads video/image into it
 cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
@@ -122,10 +123,16 @@ def main():
 														result_white, result_red, result_orange,
 														result_yellow, result_green, result_blue
 														))
+			cv2.imwrite("image_resized.jpg", result_final)
 			print(str(cubelets[0]))
 			print(str(cubelets[1]))
 			print(str(cubelets[2]))
-			cv2.imwrite("image_resized.jpg", result_final)
+			n = solving.algorithmSolve(cubelets)
 			#print("File written")
+			break
+	print("Turns required: " + str(n))
+	audio.outputAudioTurns(n)
+	print("Outputting signal for " + str(n) + " seconds")
 	cv2.destroyAllWindows()	# With everything done, release capture
+	print("Done!")
 main()
