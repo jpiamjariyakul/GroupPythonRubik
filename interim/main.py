@@ -110,8 +110,8 @@ def main():
 		cv2.imshow("Blue", result_blue)
 
 		keystroke = cv2.waitKey(1) & 0xFF	# Recognises keystroke
-		if keystroke == ord('s'): # wait for 's' key to save image
-			
+		#if keystroke == ord('s'): # wait for 's' key to save image
+		if keystroke == 32:
 			cap.release()
 
 			"""Stage 1.2: Obtain & validate pixel colors in each cubelet"""
