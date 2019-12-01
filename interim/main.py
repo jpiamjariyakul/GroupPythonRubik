@@ -110,10 +110,8 @@ def main():
 		cv2.imshow("Blue", result_blue)
 
 		keystroke = cv2.waitKey(1) & 0xFF	# Recognises keystroke
-		#if keystroke == ord('s'): # wait for 's' key to save image
-		if keystroke == 32:
+		if keystroke == 32: # wait for spacebar to run recognition
 			cap.release()
-
 			"""Stage 1.2: Obtain & validate pixel colors in each cubelet"""
 			cubelets = []	# Defines individual faces & cubelets
 			for row in range(3):	# Loop to fill all rows/columns
