@@ -140,10 +140,10 @@ def moveFace(face, cube):
 
 def scramble(cube, moveCount):
 	moves = ("U", "R", "F", "D", "L", "B")
-	isCounterClk = (True, False)
+	isInvert = (True, False)
 	moves_done = []
 	for count in range(moveCount):	
-		moves_done.append((random.choice(moves), random.choice(isCounterClk)))
+		moves_done.append((random.choice(moves), random.choice(isInvert)))
 	print(moves_done)
 	moves_collated = []
 	for rotation in moves_done:

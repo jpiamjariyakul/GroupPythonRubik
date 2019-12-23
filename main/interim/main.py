@@ -28,9 +28,8 @@ def main():
 
 		# In OpenCV, range is [179, 255, 255]
 		# Defines boundaries in HSV for the color white
-		#hsv_white = [np.array([0, 0, 200]), np.array([179, 20, 255])]
-		white_lower = np.array([0, 0, 200])
-		white_upper = np.array([179, 20, 255])
+		white_lower = np.array([100, 53, 0])
+		white_upper = np.array([120, 178, 255])
 		# Defines boundaries in HSV for the color red
 		red_lower = np.array([0, 132, 35])
 		red_upper = np.array([12, 255, 255])
@@ -61,8 +60,6 @@ def main():
 		mask_combined = cv2.erode(mask_combined,  kernel)	# Eroding reduces noise in image
 
 		# Applies a bitwise-AND operation on the combined mask and original (blurred) image
-		#result_final = cv2.bitwise_and(image_gaussian, image_gaussian, mask=mask_combined)
-		#result_final = cv2.resize(result_final, (300, 300)) # Resize image to normalised size, i.e. 300x300
 		# This allows for a normalised coordinate system afterwards
 		# Such will be used during detecting each facelets, per each point in image
 
