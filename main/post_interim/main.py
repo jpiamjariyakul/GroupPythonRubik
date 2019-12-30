@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import color
 #import audio
-import solving
+#import solving
 
 '''
 Order of Kociemba algorithm input is in following order: URFDLB
@@ -97,11 +97,10 @@ def main():
 			print(str(cubelets[0][0]) + " | " + str(cubelets[1][0]) + " | " + str(cubelets[2][0]))
 			print(str(cubelets[0][1]) + " | " + str(cubelets[1][1]) + " | " + str(cubelets[2][1]))
 			print(str(cubelets[0][2]) + " | " + str(cubelets[1][2]) + " | " + str(cubelets[2][2]))
-
-			#n = solving.algorithmSolve(cubelets)
-			n = 0
-			#print("File written")
 			break
+			#n = solving.algorithmSolve(cubelets)
+			# n = 0
+			#print("File written")
 	print("Turns required: " + str(n))
 	#audio.outputAudioTurns(n)
 	print("Outputting signal for " + str(n) + " seconds")

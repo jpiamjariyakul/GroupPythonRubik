@@ -55,16 +55,3 @@ def printUser(ls_kocSolve):
 			elif i[0] == 'B':
 				ls_user.append("BACK")
 	return ls_user
-
-cube_test = [
-	[['B', 'R', 'D'], ['F', 'U', 'U'], ['R', 'U', 'F']],
-	[['U', 'R', 'R'], ['D', 'R', 'R'], ['L', 'L', 'L']],
-	[['B', 'F', 'R'], ['U', 'F', 'R'], ['U', 'B', 'B']],
-	[['L', 'U', 'D'], ['F', 'D', 'D'], ['D', 'D', 'F']],
-	[['R', 'D', 'D'], ['B', 'L', 'L'], ['F', 'L', 'B']],
-	[['F', 'B', 'U'], ['F', 'B', 'L'], ['U', 'B', 'L']]
-]
-display.printCube(cube_test)
-str_cube = parseCubeString(cube_test)
-print(str_cube)
-print(printUser(solveCubeKoc(str_cube)))
