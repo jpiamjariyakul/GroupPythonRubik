@@ -14,7 +14,7 @@ def parseCubeString(cube):
 # Passes cubeString to Kociemba & return solving steps
 # Additionally un-parses results into list
 def solveCubeKoc(str_cube):
-	str_kocSolve = kociemba.solve(str_cube).split(" ")
+	str_kocSolve = kociemba.solve(str_cube).split(" ") # Removes white-spaces & places all Koc-output moves into list
 	ls_kocSolve = []
 	for moveSolve in str_kocSolve:
 		if len(moveSolve) != 1:
