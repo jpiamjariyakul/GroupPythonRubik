@@ -1,6 +1,6 @@
 import kociemba
 #import cube_gen.obtain_new as obtain_new
-import display as display
+#import displayCube
 
 # Parses cube list (including debug-generated) into single string
 # In order of Kociemba faces

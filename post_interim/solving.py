@@ -1,2 +1,0 @@
-import kocSolve as kc
-

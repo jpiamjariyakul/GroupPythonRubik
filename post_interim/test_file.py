@@ -1,5 +1,5 @@
 # import kocSolve
-import display
+import displayCube
 
 '''
 Testbench for testing kociemba functionality
@@ -37,7 +37,7 @@ cube_test = [
 
 # Predefined color assignments corresponding to faces
 # Defined by static cubelets in middle of face
-dict_color ={
+dict_color = {
     'B': 'U',   # Defines UP    as BLUE
     'R': 'R',   # Defines RIGHT as RED
     'W': 'F',   # Defines FRONT as WHITE
@@ -46,9 +46,8 @@ dict_color ={
     'Y': 'B'    # Defines BACK  as YELLOW
 }
 
-
 cube_face = convertColorToFace(cube_test, dict_color)
-display.printCube(cube_face) # Expect gridded view of the faces
+displayCube.printCube(cube_face) # Expect gridded view of the faces
 str_cube = kocSolve.parseCubeString(cube_face) # Parses such cube to Koc-compatible input string
 print(str_cube)
 print(kocSolve.solveCubeKoc(str_cube)) # Outputs list of moves required, in the following format: ('[face to turn]', [does face turn anti-clockwise?])
