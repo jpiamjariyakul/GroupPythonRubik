@@ -1,4 +1,4 @@
-# import kocSolve
+import kocSolve
 import displayCube
 
 '''
@@ -16,16 +16,6 @@ Testbench for testing kociemba functionality
 #     [['U', 'R', 'D'], ['U', 'B', 'U'], ['U', 'F', 'B']]
 # ]
 
-def convertColorToFace(cube_color, dict_color):
-    cube_face = []
-    for face in range(6):
-        cube_face.append([])
-        for row in range(3):
-            cube_face[face].append([])
-            for column in range(3):
-                cube_face[face][row].append(dict_color.get(cube_color[face][row][column]))
-    return cube_face
-
 cube_test = [
     [['G', 'Y', 'W'], ['W', 'B', 'W'], ['W', 'O', 'Y']], 
     [['G', 'G', 'R'], ['B', 'R', 'B'], ['O', 'R', 'W']],
@@ -35,16 +25,7 @@ cube_test = [
     [['B', 'G', 'O'], ['O', 'Y', 'R'], ['R', 'W', 'B']]
 ]
 
-# Predefined color assignments corresponding to faces
-# Defined by static cubelets in middle of face
-dict_color = {
-    'B': 'U',   # Defines UP    as BLUE
-    'R': 'R',   # Defines RIGHT as RED
-    'W': 'F',   # Defines FRONT as WHITE
-    'G': 'D',   # Defines DOWN  as GREEN
-    'O': 'L',   # Defines LEFT  as ORANGE
-    'Y': 'B'    # Defines BACK  as YELLOW
-}
+#
 
 cube_face = convertColorToFace(cube_test, dict_color)
 displayCube.printCube(cube_face) # Expect gridded view of the faces
