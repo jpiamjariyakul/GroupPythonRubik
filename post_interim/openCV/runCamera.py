@@ -1,7 +1,8 @@
-# import cv2
+import cv2
+import numpy as np
 
 # Outputs frames of different colors, including raw (scaled) & combined images
-def colorFrames(cv2, np, frame):
+def colorFrames(frame):
 	# Gaussian filter is applied to captured image - remove noises
 	image_gaussian = cv2.GaussianBlur(frame, (5, 5), 0)
 	frame_hsv = cv2.cvtColor(image_gaussian, cv2.COLOR_BGR2HSV)	# Converts color-space from BGR to HSV
@@ -37,10 +38,10 @@ def colorFrames(cv2, np, frame):
 	# Such will be used during detecting each facelets, per each point in image
 	return result_raw, result_combined, result_color # Passes raw, combined, and colored images back to parent function
 
-def readFrame(cv2, np, cap, coord_yx):
+def readFrame(cap, coord_yx):
 	ret, frame = cap.read()
 	frame = cv2.resize(frame, (300, 300))
-	result_raw, result_combined, result_color = colorFrames(cv2, np, frame)
+	result_raw, result_combined, result_color = colorFrames(frame)
 
 	red_pixel = (0, 0, 255)
 	dot_radius = 3
@@ -57,12 +58,12 @@ def readFrame(cv2, np, cap, coord_yx):
 	[cv2.imshow(ls_strColor[i], result_color[i]) for i in range(len(ls_strColor))]
 	return result_combined, result_color
 
-def runCamera(cv2, np, coord_yx):
+def runCamera(coord_yx):
 	cap = cv2.VideoCapture(0)
 	while(True):
 		# Capture frame-by-frame by iterating single function readFrame
 		# Returns necessary arrays containing color information passed back to parent
-		result_combined, result_color = readFrame(cv2, np, cap, coord_yx)
+		result_combined, result_color = readFrame(cap, coord_yx)
 		keystroke = cv2.waitKey(1) & 0xFF	# Recognises keystroke
 		if keystroke == 32: # wait for spacebar to run recognition
 			cap.release()

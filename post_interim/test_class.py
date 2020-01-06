@@ -8,7 +8,7 @@ class cube:
 		for i in range(6):
 			self.dict_color[self.tp_face[i]] = color[i]
 			print(self.dict_color)
-			self.ls_face[i] = face(color[i]).__class__
+			self.ls_face[i] = tempFace().__class__
 			print(self.ls_face[0].cubelet)
 
 class face:
