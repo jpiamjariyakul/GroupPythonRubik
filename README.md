@@ -14,5 +14,7 @@ Working code is in directory "PhotoRecognition"
 - Python3 or higher
 - OpenCV-Python
 - Numpy
+- PySimpleGUI
+- PyGame
 
 More dependencies to be added as project progresses
