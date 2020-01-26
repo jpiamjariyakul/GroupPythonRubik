@@ -1,21 +1,20 @@
 ### Imports prerequisites & libraries
-import colorDetect.checkColor as color
-import openCV.runCamera as runCamera
+import imageParse.colorCheck as colorCheck
+import imageParse.runCamera as runCamera
 
 '''
 Order of Kociemba algorithm input is in following order: URFDLB
 '''
-
 def main():
 	#frame = cv2.imread("image_prescaled.jpg", cv2.IMREAD_COLOR)	# Debug purposes only
-	result_combined, result_color = runCamera.runCamera(color.coord_yx)
+	result_combined, result_color = runCamera.runCamera()
 	cubelets = []   # Defines individual faces & its cubelets
 	for face in range(3):
 		cubelets.append([]) # Creates sublist for face
 		for row in range(3):	# Loop to fill all rows/columns
 			cubelets[face].append([]) # Creates sublist for rows
 			for column in range(3):
-				cubelets[face][row].append(color.verifyColor(	face, row, column, result_combined,
+				cubelets[face][row].append(colorCheck.verifyColor(	face, row, column, result_combined,
 																result_color[0], result_color[1], result_color[2],
 																result_color[3], result_color[4], result_color[5]
 																))
