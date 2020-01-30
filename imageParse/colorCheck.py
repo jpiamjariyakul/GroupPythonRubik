@@ -1,5 +1,5 @@
 import numpy as np
-from coord_yx import coord_yx as coord_yx
+from coord_yx import coord_yx
 
 ### Declares faces visible to camera & to be analysed
 # Tuple storing pixels to check in image - amended later to accommodate rig

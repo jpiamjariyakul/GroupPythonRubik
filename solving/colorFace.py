@@ -1,8 +1,7 @@
 # Predefined color assignments corresponding to faces
 # Defined by static cubelets in middle of face
 
-def convertColorToFace(cube_color, dict_color):
-    dict_color = {
+dict_color = {
         'B': 'U',   # Defines UP    as BLUE
         'R': 'R',   # Defines RIGHT as RED
         'W': 'F',   # Defines FRONT as WHITE
@@ -10,6 +9,8 @@ def convertColorToFace(cube_color, dict_color):
         'O': 'L',   # Defines LEFT  as ORANGE
         'Y': 'B'    # Defines BACK  as YELLOW
     }
+
+def convertColorToFace(cube_color):
     cube_face = []
     for face in range(6):
         cube_face.append([])
