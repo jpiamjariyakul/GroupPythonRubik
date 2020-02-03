@@ -1,6 +1,11 @@
 import PySimpleGUI as sg
 import random
 
+import cubeGenerate.obtainNew as obtainNew
+import solving.kocSolve as kocSolve
+
+sg.theme("Reddit")
+'''
 cube = 	[
     [['G', 'Y', 'W'], ['W', 'B', 'W'], ['W', 'O', 'Y']], 
     [['G', 'G', 'R'], ['B', 'R', 'B'], ['O', 'R', 'W']],
@@ -9,68 +14,109 @@ cube = 	[
     [['Y', 'O', 'B'], ['G', 'O', 'Y'], ['O', 'W', 'Y']],
     [['B', 'G', 'O'], ['O', 'Y', 'R'], ['R', 'W', 'B']]
 ]
+'''
 
 CUBE_SIZE = 20
 FACE_SIZE = CUBE_SIZE * 3
 
-frame_input = [
-	[sg.Text("Click to test"), sg.Button("Get")]
+# For testing purposes - obtains new cube (scrambling optional)
+
+def windowDefine():
+	# Define frames & its individual internal components
+	frame_input = [
+		[sg.Text("Click to obtain new cube"), sg.Button("Get", key="_get_"), sg.Button("Confirm", key="_confirm_", disabled=True)]
+		]
+	frame_cube =	[
+		[sg.Graph((400, 400), (0, 180), (240, 0), key="_net_", change_submits=True, drag_submits=False), sg.Listbox(key="_listMoves_", values=[], size=(4, 8), disabled=True)],
+		[sg.Slider(key="_movesProgress_", orientation="horizontal", disabled=True, range=(0, 0))]
+		]
+	frame_button_bottom = [
+		[sg.Button("Solve"), sg.Button("Fill"), sg.Button("Reset"), sg.Button("Cancel")]
 	]
-frame_cube =	[
-	[sg.Graph((400, 400), (0, 180), (240, 0), key='-GRAPH-', change_submits=True, drag_submits=False)],
-	[sg.Slider(orientation="horizontal", range=(1, 20))]
+	# Given defined frames, define layout of window
+	layout = [
+		[sg.Frame("Test Frame", frame_input)],
+		[sg.Frame("Net Representation", frame_cube)],
+		[sg.Frame("button_bottom", frame_button_bottom)]
 	]
-layout = [
-    [sg.Text("Rubik's Cube Solver GUI Prototype")], #, sg.Text('', key='-OUTPUT-')],
-	[sg.Frame("Test Frame", frame_input)],
-    [sg.Frame("Net Representation", frame_cube)],
-    [sg.Button("Solve"), sg.Button("Fill"), sg.Button("Cancel")]
-]
-
-window = sg.Window("Window Title", layout, finalize=True)
-g = window["-GRAPH-"]
-
-def returnFaceCoord(face):
-	if face == 0: return (1, 0)
-	elif face == 1: return (2, 1)
-	elif face == 2: return (1, 1)
-	elif face == 3: return (1, 2)
-	elif face == 4: return (0, 1)
-	elif face == 5: return (3, 1)
-
-for face_row in range(3):
-	for face_col in range(4):
-		if (face_col == 1) or (face_row == 1):
-			g.draw_rectangle(	(	(face_col * FACE_SIZE), 
-									(face_row * FACE_SIZE)	),
-								(	((face_col * FACE_SIZE) + FACE_SIZE), 
-									((face_row * FACE_SIZE) + FACE_SIZE)	),
-								line_color="black", line_width=4
-							)
-
-while True:
-	event, values = window.read()
-	if event in (None, "Cancel"):
-		break
-	elif event in (None, "Fill"):
-		for face in range(6):
-			coordFace = returnFaceCoord(face)
-			for cube_row in range(3):
-				for cube_col in range(3):
-					cubeCurrent = cube[face][cube_row][cube_col]
-					if 		(cubeCurrent == 'W'): 	colorCube = "white"
-					elif	(cubeCurrent == 'R'): 	colorCube = "red"
-					elif 	(cubeCurrent == 'O'): 	colorCube = "orange"
-					elif 	(cubeCurrent == 'Y'): 	colorCube = "yellow"
-					elif 	(cubeCurrent == 'G'): 	colorCube = "green"
-					elif 	(cubeCurrent == 'B'): 	colorCube = "blue"
-					g.draw_rectangle(	(	(FACE_SIZE * coordFace[0]) + (cube_col * CUBE_SIZE), 
-											(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	),
-										(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
-											(FACE_SIZE * coordFace[1]) + ((cube_row * CUBE_SIZE) + CUBE_SIZE)	),
-										fill_color=colorCube, line_width=1
+	def graphDefine(window):
+		#g = window["_net_"]
+		for face_row in range(3):
+			for face_col in range(4):
+				if (face_col == 1) or (face_row == 1):
+					window["_net_"].draw_rectangle(	(	(face_col * FACE_SIZE), 
+											(face_row * FACE_SIZE)	),
+										(	((face_col * FACE_SIZE) + FACE_SIZE), 
+											((face_row * FACE_SIZE) + FACE_SIZE)	),
+										line_color="black"
 									)
-		print("Color filled!")
+		#return g
+	window = sg.Window("Window Title", layout,finalize=True)
+	graphDefine(window)
+	return window # , g
 
-window.close()
+def drawCubelets(window, cube):
+	for face in range(6):
+		dict_coordFace = {
+			0: (1, 0),
+			1: (2, 1),
+			2: (1, 1),
+			3: (1, 2),
+			4: (0, 1),
+			5: (3, 1)
+		}
+		coordFace = dict_coordFace.get(face)
+		for cube_row in range(3):
+			for cube_col in range(3):
+				"""
+				dict_colorAbbrev = {
+					'W': "white",
+					'R': "red",
+					'O': "orange",
+					'Y': "yellow",
+					'G': "green",
+					'B': "blue"
+				}
+				"""
+				dict_colorAbbrev = {
+					'U': "white",
+					'R': "red",
+					'F': "orange",
+					'D': "yellow",
+					'L': "green",
+					'B': "blue"
+				}
+				colorCube = dict_colorAbbrev.get(cube[face][cube_row][cube_col])
+				window["_net_"].draw_rectangle(	(	(FACE_SIZE * coordFace[0]) + (cube_col * CUBE_SIZE), 
+										(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	),
+									(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
+										(FACE_SIZE * coordFace[1]) + ((cube_row * CUBE_SIZE) + CUBE_SIZE)	),
+									fill_color=colorCube
+								)
 
+def main():
+	window = windowDefine()
+	while True:
+		event, values = window.read()
+		if event in (None, "Cancel"):
+			break
+		elif event in (None, "Reset"):
+			window.close()
+			window = windowDefine()
+		elif event in (None, "_get_"):
+			window["_get_"].update(disabled=True)
+			window["_confirm_"].update(disabled=False)
+		elif event in (None, "_confirm_"):
+			# Debug purposes - generates new cube
+			cube = obtainNew.obtainVirCube(10)
+			drawCubelets(window, cube)
+			window["_confirm_"].update(disabled=True)
+			moves, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+			#print(moves)
+			window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+			window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
+		elif event in (None, "Fill"):
+			print("Color filled!")
+	window.close()
+
+main()

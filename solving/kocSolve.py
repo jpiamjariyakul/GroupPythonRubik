@@ -23,4 +23,4 @@ def solveCubeKoc(str_cube):
 			elif moveSolve[1] == "2":
 				[ls_kocSolve.append((moveSolve[0], False)) for i in range(2)]
 		else: ls_kocSolve.append((moveSolve, False))
-	return ls_kocSolve
+	return ls_kocSolve, str_kocSolve

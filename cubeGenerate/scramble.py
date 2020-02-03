@@ -3,7 +3,7 @@
 import random
 from copy import deepcopy
 
-from . import display
+#from . import display
 
 def rotateStationary(face, cube_og, cube_copy):
 	# Rotates top row
@@ -144,14 +144,14 @@ def scramble(cube, moveCount):
 	moves_done = []
 	for count in range(moveCount):	
 		moves_done.append((random.choice(moves), random.choice(isInvert)))
-	print(moves_done)
+	#print(moves_done)
 	moves_collated = []
 	for rotation in moves_done:
 		if rotation[1] == True:
 			[moves_collated.append(rotation[0]) for i in range(3)]
 		else:
 			moves_collated.append(rotation[0])
-	print("".join(moves_collated))
+	#print("".join(moves_collated))
 	for moving in moves_collated:
 		cube = moveFace(moving, cube)
 		#display.printCube(cube)
