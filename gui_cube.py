@@ -4,6 +4,10 @@ import random
 import cubeGenerate.obtainNew as obtainNew
 import solving.kocSolve as kocSolve
 
+from solving.dictColor import dict_faceColor
+
+from copy import deepcopy
+
 sg.theme("Reddit")
 '''
 cube = 	[
@@ -68,7 +72,6 @@ def drawCubelets(window, cube):
 		coordFace = dict_coordFace.get(face)
 		for cube_row in range(3):
 			for cube_col in range(3):
-				"""
 				dict_colorAbbrev = {
 					'W': "white",
 					'R': "red",
@@ -77,16 +80,7 @@ def drawCubelets(window, cube):
 					'G': "green",
 					'B': "blue"
 				}
-				"""
-				dict_colorAbbrev = {
-					'U': "white",
-					'R': "red",
-					'F': "orange",
-					'D': "yellow",
-					'L': "green",
-					'B': "blue"
-				}
-				colorCube = dict_colorAbbrev.get(cube[face][cube_row][cube_col])
+				colorCube = dict_colorAbbrev.get(dict_faceColor.get(cube[face][cube_row][cube_col]))
 				window["_net_"].draw_rectangle(	(	(FACE_SIZE * coordFace[0]) + (cube_col * CUBE_SIZE), 
 										(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	),
 									(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
@@ -94,29 +88,36 @@ def drawCubelets(window, cube):
 									fill_color=colorCube
 								)
 
+
 def main():
 	window = windowDefine()
 	while True:
 		event, values = window.read()
 		if event in (None, "Cancel"):
 			break
-		elif event in (None, "Reset"):
+		elif event in ("Reset"):
 			window.close()
 			window = windowDefine()
-		elif event in (None, "_get_"):
+		elif event in ("_get_"):
 			window["_get_"].update(disabled=True)
 			window["_confirm_"].update(disabled=False)
-		elif event in (None, "_confirm_"):
-			# Debug purposes - generates new cube
-			cube = obtainNew.obtainVirCube(10)
+		elif event in ("_confirm_"):
+			cube = obtainNew.obtainVirCube(6) # Debug purposes - generates new cube
 			drawCubelets(window, cube)
 			window["_confirm_"].update(disabled=True)
-			moves, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-			#print(moves)
+			ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
 			window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+			#print(ls_kocSolve)
+			#if sz != movesStatus:
+			cube_temp = deepcopy(cube)
+			
 			window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
-		elif event in (None, "Fill"):
+		elif event in ("Fill"):
 			print("Color filled!")
+		
+		sz = int(values["_movesProgress_"])
+		print(sz)
+
 	window.close()
 
 main()

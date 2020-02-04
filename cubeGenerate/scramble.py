@@ -5,6 +5,7 @@ from copy import deepcopy
 
 #from . import display
 
+# Rotates cubelets on face
 def rotateStationary(face, cube_og, cube_copy):
 	# Rotates top row
 	cube_copy[face][0][2] = cube_og[face][0][0]
@@ -19,7 +20,10 @@ def rotateStationary(face, cube_og, cube_copy):
 	cube_copy[face][2][0] = cube_og[face][2][2]
 	return cube_copy
 
+# Excluding opposite face, rotates all faces affected by rotation
 def moveFace(face, cube):
+	# Cubelets on face rotated with rotateStationary() function
+	# Other faces shift their cubelets' colors
 	cube_temp = deepcopy(cube)
 	# Currently assumes clockwise turn
 	if (face == "U"):
