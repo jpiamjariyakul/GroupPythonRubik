@@ -9,21 +9,6 @@ Following parameters of cube:
 - 6 faces
 '''
 
-# Prints Rubik's Cube arrays into a user-friendly format on console
-def printCube(cube):
-	gap = 18 * " "
-	print(gap + str(cube[0][0]))
-	print(gap + str(cube[0][1]))
-	print(gap + str(cube[0][2]))
-	print(17 * " " + + 17 * "-")
-	print(str(cube[4][0]) + " | " + str(cube[2][0]) + " | " + str(cube[1][0]) + " | " + str(cube[5][0]))
-	print(str(cube[4][1]) + " | " + str(cube[2][1]) + " | " + str(cube[1][1]) + " | " + str(cube[5][1]))
-	print(str(cube[4][2]) + " | " + str(cube[2][2]) + " | " + str(cube[1][2]) + " | " + str(cube[5][2]))
-	print(17 * " " + + 17 * "-")
-	print(gap + str(cube[3][0]))
-	print(gap + str(cube[3][1]))
-	print(gap + str(cube[3][2]))
-
 # Prints Kociemba-generated output moves into a user-friendly list
 def printUser(ls_kocSolve):
 	ls_user = []

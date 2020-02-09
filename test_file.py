@@ -1,6 +1,7 @@
 import solving.kocSolve as kocSolve
 import solving.colorFace as colorFace
 import misc
+import imageParse.colorCheck as colorCheck
 
 '''
 Testbench for testing kociemba functionality
