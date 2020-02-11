@@ -9,40 +9,30 @@ from variables import dict_colorFace
 Order of Kociemba algorithm input is in following order: URFDLB
 '''
 
-def main():
+def verifyEachCamera(camera, result_combined, result_color):
+	cubeletTemp = []
+	for face in range(0, 3): # Runs for camera affiliated with URF faces
+		cubeletTemp.append([]) # Creates sublist for face
+		for row in range(3):	# Loop to fill all rows/columns
+			cubeletTemp[face].append([]) # Creates sublist for rows
+			for column in range(3):
+				#print("camera = " + str(camera))
+				cubeletTemp[face][row].append(
+							colorCheck.verifyColor(	camera, face, row, column,
+													result_combined[camera],
+													result_color[camera][0], result_color[camera][1], 
+													result_color[camera][2], result_color[camera][3],
+													result_color[camera][4], result_color[camera][5]))
+				#print(colorTemp)
+				#cubeletTemp[face][row].append(dict_colorFace.get(colorTemp))
+	return cubeletTemp
+
+def initCamera():
 	#frame = cv2.imread("image_prescaled.jpg", cv2.IMREAD_COLOR)	# Debug purposes only
 	result_combined, result_color = runCamera.runCamera()
-	cubelets_0 = []   # Defines individual faces & its cubelets
-	cubelets_1 = []
-	for face in range(0, 3): # Runs for camera affiliated with URF faces
-		cubelets_0.append([]) # Creates sublist for face
-		print("Current face: " + str(face))
-		for row in range(3):	# Loop to fill all rows/columns
-			cubelets_0[face].append([]) # Creates sublist for rows
-			for column in range(3):
-				cubelets_0[face][row].append(
-					dict_colorFace.get(
-						colorCheck.verifyColor(	0, face, row, column,
-												result_combined[0],
-												result_color[0][0], result_color[0][1], 
-												result_color[0][2], result_color[0][3],
-												result_color[0][4], result_color[0][5]
-												)))
-	for face in range(0, 3): # Runs for camera affiliated with DLB faces
-		cubelets_1.append([]) # Creates sublist for face
-		for row in range(3):	# Loop to fill all rows/columns
-			cubelets_1[face].append([]) # Creates sublist for rows
-			for column in range(3):
-				cubelets_1[face][row].append(
-					dict_colorFace.get(
-						colorCheck.verifyColor(	1, face, row, column,
-												result_combined[1],
-												result_color[1][0], result_color[1][1],
-												result_color[1][2], result_color[1][3],
-												result_color[1][4], result_color[1][5]
-												)))
-	cubelets = cubelets_0 + cubelets_1
+	cubelets = verifyEachCamera(0, result_combined, result_color) \
+				 + verifyEachCamera(1, result_combined, result_color)
 	cubeDisplay.printCube(cubelets)
-	print("Done!")
+	return cubelets
 	
-main()
+initCamera()
