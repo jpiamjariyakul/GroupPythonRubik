@@ -84,8 +84,8 @@ def runCamera():
 		cv2.imshow("Raw 1", result_raw_1)	# Displays image/video in frame
 		cv2.imshow("Combined 0", result_combined_0)
 		cv2.imshow("White 1", result_combined_1)
-		[cv2.imshow(("Color 0: " + str(index)), result_color_0[index]) for index in range(len(result_color_0))]
-		[cv2.imshow(("Color 1: " + str(index)), result_color_1[index]) for index in range(len(result_color_1))]
+		#[cv2.imshow(("Color 0: " + str(index)), result_color_0[index]) for index in range(len(result_color_0))]
+		#[cv2.imshow(("Color 1: " + str(index)), result_color_1[index]) for index in range(len(result_color_1))]
 		#cv2.imshow("Combined 1", result_combined_1)
 
 		keystroke = cv2.waitKey(1) & 0xFF	# Recognises keystroke

@@ -10,4 +10,4 @@ def obtainVirCube(scrambles=0):
 		cubelets = cg_s.scramble(cubelets, scrambles)
 	return cubelets
 
-cg_d.printCube(obtainVirCube(3))
+#cg_d.printCube(obtainVirCube(3))

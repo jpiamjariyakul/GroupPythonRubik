@@ -1,6 +1,6 @@
 ### Imports prerequisites & libraries
 import imgParse_colorCheck as colorCheck
-import imgParse_runCamera as runCamera
+import imgParse_camColor as camColor
 import cubeGen_display as cubeDisplay
 
 from variables import dict_colorFace
@@ -29,10 +29,10 @@ def verifyEachCamera(camera, result_combined, result_color):
 
 def initCamera():
 	#frame = cv2.imread("image_prescaled.jpg", cv2.IMREAD_COLOR)	# Debug purposes only
-	result_combined, result_color = runCamera.runCamera()
+	result_combined, result_color = camColor.runCamera()
 	cubelets = verifyEachCamera(0, result_combined, result_color) \
 				 + verifyEachCamera(1, result_combined, result_color)
 	cubeDisplay.printCube(cubelets)
 	return cubelets
 	
-initCamera()
+#initCamera()

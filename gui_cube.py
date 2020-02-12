@@ -6,22 +6,23 @@ import cubeGen_display as cubeDisplay
 import cubeGen_getNew as getNew
 
 import solve_kocSolve as kocSolve
-from dictColor import dict_faceColor
+from variables import dict_faceColor
 
 import time
 from copy import deepcopy
 
-sg.theme("Reddit")
+import mainCamera
+
+sg.theme("DarkBlack")
 
 CUBE_SIZE = 20
 FACE_SIZE = CUBE_SIZE * 3
 
-# For testing purposes - obtains new cube (scrambling optional)
-
+# For testing purposes - obtains new cube (scrambling optional)\
 def windowDefine():
 	# Define frames & its individual internal components
 	frame_input = [
-		[sg.Text("Click to obtain new cube"), sg.Button("Get", key="_get_"), sg.Button("Confirm", key="_confirm_", disabled=True)]
+		[sg.Text("Click to run cameras", key="_textRunCam_"), sg.Button("Get", key="_get_"), sg.Button("Confirm", key="_confirm_", disabled=True)]
 		]
 	frame_cube =	[
 		[sg.Graph((400, 400), (0, 180), (240, 0), pad=(20, 20), key="_net_", change_submits=True, drag_submits=False), sg.Listbox(key="_listMoves_", values=[], size=(4, 8), disabled=True)],
@@ -79,6 +80,7 @@ def drawCubelets(window, cube):
 
 
 def main():
+	#print("Making window")
 	window = windowDefine()
 	#cubeObtained = False
 	while True:
@@ -91,9 +93,11 @@ def main():
 			window = windowDefine()
 			#cubeObtained = False
 		elif event in ("_get_"):
+			window["_textRunCam_"].update("Press [SPACE] to confirm camera images")
 			window["_get_"].update(disabled=True)
 			window["_confirm_"].update(disabled=False)
-		elif event in ("_confirm_"):
+			cubeTest = mainCamera.initCamera()
+			cubeDisplay.printCube(cubeTest)
 			cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
 			drawCubelets(window, cube)
 			window["_confirm_"].update(disabled=True)
@@ -105,6 +109,32 @@ def main():
 			window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
 			window["_solve_"].update(disabled=False)
 			cubeDisplay.printCube(cube)
+		# elif event in ("_confirm_"):
+		# 	cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
+		# 	drawCubelets(window, cube)
+		# 	window["_confirm_"].update(disabled=True)
+		# 	ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+		# 	window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+		# 	print(ls_kocSolve)
+		# 	#if sz != movesStatus:
+		# 	cubeObtained = True
+		# 	window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
+		# 	window["_solve_"].update(disabled=False)
+		# 	cubeDisplay.printCube(cube)
+
+
+		# elif event in ("_confirm_"):
+		# 	cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
+		# 	drawCubelets(window, cube)
+		# 	window["_confirm_"].update(disabled=True)
+		# 	ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+		# 	window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+		# 	print(ls_kocSolve)
+		# 	#if sz != movesStatus:
+		# 	cubeObtained = True
+		# 	window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
+		# 	window["_solve_"].update(disabled=False)
+		# 	cubeDisplay.printCube(cube)
 		elif event in ("Fill"):
 			print("Color filled!")
 		elif event in ("_solve_"):
