@@ -27,12 +27,16 @@ def verifyEachCamera(camera, result_combined, result_color):
 				#cubeletTemp[face][row].append(dict_colorFace.get(colorTemp))
 	return cubeletTemp
 
+def cam_obtainCubelets(result_combined, result_color):
+	cubelets = verifyEachCamera(0, result_combined, result_color) \
+				 + verifyEachCamera(1, result_combined, result_color)
+	return cubelets
+
 def initCamera():
 	#frame = cv2.imread("image_prescaled.jpg", cv2.IMREAD_COLOR)	# Debug purposes only
 	result_combined, result_color = camColor.runCamera()
-	cubelets = verifyEachCamera(0, result_combined, result_color) \
-				 + verifyEachCamera(1, result_combined, result_color)
+	cubelets = cam_obtainCubelets(result_combined, result_color)
 	cubeDisplay.printCube(cubelets)
 	return cubelets
-	
+
 #initCamera()

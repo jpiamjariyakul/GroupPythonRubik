@@ -69,29 +69,45 @@ def readFrame(cap, camera):
 				img = cv2.circle(result_raw, coord_xy, dot_radius, (color_pixel), -1)
 	return result_raw, result_combined, result_color
 
+def cam_initCap():
+	cap_0 = cv2.VideoCapture(0) # Camera 1
+	cap_1 = cv2.VideoCapture(1) # Camera 2
+	return cap_0, cap_1
+
+def cam_obtain(cap_0, cap_1):
+	result_raw_0, result_combined_0, result_color_0 = readFrame(cap_0, 0)
+	result_raw_1, result_combined_1, result_color_1 = readFrame(cap_1, 1)
+	'''
+	cv2.imshow("Raw 0", result_raw_0)	# Displays image/video in frame
+	cv2.imshow("Raw 1", result_raw_1)	# Displays image/video in frame
+	cv2.imshow("Combined 0", result_combined_0)
+	cv2.imshow("White 1", result_combined_1)
+	'''
+	return (result_raw_0, result_raw_1), (result_combined_0, result_combined_1), (result_color_0, result_color_1)
+
+def cam_getImgbytes(frame):
+	return cv2.imencode('.png', frame)[1].tobytes()
+
+def cam_releaseCap(cap_0, cap_1):
+	cap_0.release()
+	cap_1.release()
+	cv2.destroyAllWindows()	# With everything done, release capture
+
 def runCamera():
 	# Considers two cameras - runs both simultaneously
 	# NB: Change parameters of VideoCapture to change between webcams
-	cap_0 = cv2.VideoCapture(0) # Camera 1
-	cap_1 = cv2.VideoCapture(1) # Camera 2
+	cap_0, cap_1 = cam_initCap()
 	while(True):
 		# Capture frame-by-frame by iterating single function readFrame
 		# Returns necessary arrays containing color information passed back to parent
-		result_raw_0, result_combined_0, result_color_0 = readFrame(cap_0, 0)
-		result_raw_1, result_combined_1, result_color_1 = readFrame(cap_1, 1)
-
-		cv2.imshow("Raw 0", result_raw_0)	# Displays image/video in frame
-		cv2.imshow("Raw 1", result_raw_1)	# Displays image/video in frame
-		cv2.imshow("Combined 0", result_combined_0)
-		cv2.imshow("White 1", result_combined_1)
+		
+		result_raw, result_combined, result_color = cam_obtain(cap_0, cap_1)
 		#[cv2.imshow(("Color 0: " + str(index)), result_color_0[index]) for index in range(len(result_color_0))]
 		#[cv2.imshow(("Color 1: " + str(index)), result_color_1[index]) for index in range(len(result_color_1))]
 		#cv2.imshow("Combined 1", result_combined_1)
 
 		keystroke = cv2.waitKey(1) & 0xFF	# Recognises keystroke
 		if keystroke == 32: # wait for spacebar to run recognition
-			cap_0.release()
-			cap_1.release()
 			break
-	cv2.destroyAllWindows()	# With everything done, release capture
-	return (result_combined_0, result_combined_1), (result_color_0, result_color_1)
+	cam_releaseCap(cap_0, cap_1)
+	return (result_combined[0], result_combined[1]), (result_color[0], result_color[1])

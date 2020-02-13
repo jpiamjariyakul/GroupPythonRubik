@@ -15,7 +15,7 @@ from copy import deepcopy
 
 import mainCamera
 
-sg.theme("DarkBlack")
+sg.theme("Reddit")
 
 CUBE_SIZE = 20
 FACE_SIZE = CUBE_SIZE * 3
@@ -98,19 +98,19 @@ def main(isRunningCam = False):
 	#print("Making window")
 	window = windowDefine()
 	#cubeObtained = False
-	while True:
+	while True: # State 1 - Waiting to initialise camera
 		event, values = window.read()
 		if event in (None, "Cancel"):
 			break
-
 		if event in ("_get_"):
 			window["_textRunCam_"].update("Howdy bitches")
 			window["_get_"].update(disabled=True)
 			window["_confirm_"].update(disabled=False)
 			break
+
 	cap_0, cap_1 = camColor.cam_initCap()
 
-	while True:
+	while True: # State 2 - running camera
 		event, values = window.read(timeout=0, timeout_key='timeout')
 
 		result_raw, result_combined, result_color = camColor.cam_obtain(cap_0, cap_1)
@@ -124,57 +124,28 @@ def main(isRunningCam = False):
 		if event in ("Reset"):
 			window.close()
 			window = windowDefine()
-			#cubeObtained = False
-
 		elif event in ("_confirm_"):
-			camColor.cam_releaseCap(cap_0, cap_1)
-			print("ENGLISH MOTHERFUCKER DO YOU SPEAK IT")
-			cubelets = mainCamera.cam_obtainCubelets(result_combined, result_color)
-			cubeDisplay.printCube(cubelets)
-			# Releases OCV once done!
-			cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
-			drawCubelets(window, cube)
-			window["_confirm_"].update(disabled=True)
-			ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-			window["_listMoves_"].update(disabled=False, values=str_kocSolve)
-			print(ls_kocSolve)
-			#if sz != movesStatus:
-			cubeObtained = True
-			window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
-			window["_solve_"].update(disabled=False)
-			cubeDisplay.printCube(cube)
+			camColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
+			break
+			
+	cubelets = mainCamera.cam_obtainCubelets(result_combined, result_color)
+	cubeDisplay.printCube(cubelets)
 
+	cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
+	drawCubelets(window, cube)
+	window["_confirm_"].update(disabled=True)
+	ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+	window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+	print(ls_kocSolve)
+	window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
+	window["_solve_"].update(disabled=False)
+	cubeDisplay.printCube(cube)
 
-		# elif event in ("_confirm_"):
-		# 	cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
-		# 	drawCubelets(window, cube)
-		# 	window["_confirm_"].update(disabled=True)
-		# 	ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-		# 	window["_listMoves_"].update(disabled=False, values=str_kocSolve)
-		# 	print(ls_kocSolve)
-		# 	#if sz != movesStatus:
-		# 	cubeObtained = True
-		# 	window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
-		# 	window["_solve_"].update(disabled=False)
-		# 	cubeDisplay.printCube(cube)
-		elif event in ("Fill"):
-			print("Color filled!")
-		elif event in ("_solve_"):
-			# Once in this event, no termination permitted until solving is finished
-			#print(ls_kocSolve)
-			window["_movesProgress_"].update(disabled=True)
-			window["_solve_"].update(disabled=True)
-			drawCubelets(window, cube)
-			for moveCurrent in ls_kocSolve:
-				#input("Solving " + moveCurrent[0])
-				for i in range(moveCurrent[1]):
-					cube = scramble.moveFace(moveCurrent[0], cube)
-				drawCubelets(window, cube)
-	
-	
+	while True: # State 3 - Cube captures, spitting moves + allowing motor movement
+		event, values = window.read(timeout=0, timeout_key='timeout')
 		if event in (None, "Cancel"):
 			break
-		
+
 		if event in ("_movesProgress_"): # Displays cube changes throughout the solving algorithm
 			# Given valid slider values & is changing position
 			# Assumes cube is obtained & kociemba moves are valid
@@ -194,6 +165,17 @@ def main(isRunningCam = False):
 					for i in range(ls_kocSolve[moveCurrent][1]):
 						cube_disp = scramble.moveFace(ls_kocSolve[moveCurrent][0], cube_disp)
 			drawCubelets(window, cube_disp)
+		elif event in ("_solve_"):
+			# Once in this event, no termination permitted until solving is finished
+			#print(ls_kocSolve)
+			window["_movesProgress_"].update(disabled=True)
+			window["_solve_"].update(disabled=True)
+			drawCubelets(window, cube)
+			for moveCurrent in ls_kocSolve:
+				#input("Solving " + moveCurrent[0])
+				for i in range(moveCurrent[1]):
+					cube = scramble.moveFace(moveCurrent[0], cube)
+				drawCubelets(window, cube)
 	window.close() # GUI loop exited - destroy window
 
 main()
