@@ -1,5 +1,8 @@
-import PySimpleGUI as sg
+import time
+from copy import deepcopy
 import random
+
+import PySimpleGUI as sg
 
 import cubeGen_scramble as scramble
 import cubeGen_display as cubeDisplay
@@ -9,11 +12,8 @@ import solve_kocSolve as kocSolve
 from variables import dict_faceColor
 
 import imgParse_camColor as camColor
+import imgParse_initCam as initCam
 
-import time
-from copy import deepcopy
-
-import mainCamera
 
 sg.theme("Reddit")
 
@@ -23,17 +23,16 @@ FACE_SIZE = CUBE_SIZE * 3
 # For testing purposes - obtains new cube (scrambling optional)\
 def windowDefine():
 	# Define frames & its individual internal components
-	frame_cam_input = [
-		[	sg.Text("Click to run cameras", key="_textRunCam_"),
-			sg.Button("Get", key="_get_"),
-			sg.Button("Confirm", key="_confirm_", disabled=True)
-			] ]
-	frame_cam_img = [[	sg.Column([
-							[sg.Image(filename='', key='frame_0', size=(300, 300))],
-							[sg.Image(filename='', key='frame_1', size=(300, 300))]	
-							])	]]
-	frame_cam = [	[	sg.Column([	[sg.Frame('', frame_cam_input)],
-									[sg.Frame('', frame_cam_img)]	]	)	]	]
+	frame_cam = [	[	sg.Text("Click to run cameras", key="_textRunCam_"),
+						sg.Button("Get", key="_get_"),
+						sg.Button("Confirm", key="_confirm_", disabled=True)
+						],
+					[	sg.Column([		[	sg.Image(filename='', key="frame_raw_0", size=(200, 200)), 
+											sg.Image(filename='', key="frame_combined_0", size=(200, 200))	],
+										[	sg.Image(filename='', key="frame_raw_1", size=(200, 200)),
+											sg.Image(filename='', key="frame_combined_1", size=(200, 200))	]	
+									])	]
+									]
 
 	frame_cube =	[
 			[	sg.Graph((400, 400), (0, 180), (240, 0), pad=(20, 20), key="_net_", change_submits=True, drag_submits=False),
@@ -41,13 +40,12 @@ def windowDefine():
 				],
 			[	sg.Text("Index: "), sg.Text("?", key="_moveIndex_", size=(3, 1)),
 				sg.Slider(key="_movesProgress_", orientation="horizontal", disable_number_display=True, disabled=True, range=(0, 0), enable_events=True),
-				sg.Text("Current Move: "), sg.Text("?", key="_moveCurrent_", size=(4, 1))]
-		]
+				sg.Text("Current Move: "), sg.Text("?", key="_moveCurrent_", size=(4, 1))]	]
 	frame_button_bottom = [	[	sg.Button("Solve", disabled=True, key="_solve_"),
 								sg.Button("Fill"), sg.Button("Reset"), sg.Button("Cancel")
 								]	]
 	# Given defined frames, define layout of window
-	layout = [	[	sg.Frame("Howdy", frame_cam),
+	layout = [	[	sg.Frame("Camera Output", frame_cam),
 					sg.Column(	[	[sg.Frame("Net Representation", frame_cube)],
 									[sg.Frame("button_bottom", frame_button_bottom)]
 								])
@@ -94,7 +92,7 @@ def drawCubelets(window, cube):
 								)
 
 
-def main(isRunningCam = False):
+def main():
 	#print("Making window")
 	window = windowDefine()
 	#cubeObtained = False
@@ -102,6 +100,9 @@ def main(isRunningCam = False):
 		event, values = window.read()
 		if event in (None, "Cancel"):
 			break
+		if event in ("Reset"):
+			window.close()
+			window = windowDefine()
 		if event in ("_get_"):
 			window["_textRunCam_"].update("Howdy bitches")
 			window["_get_"].update(disabled=True)
@@ -114,10 +115,14 @@ def main(isRunningCam = False):
 		event, values = window.read(timeout=0, timeout_key='timeout')
 
 		result_raw, result_combined, result_color = camColor.cam_obtain(cap_0, cap_1)
-		imgbytes = (	camColor.cam_getImgbytes(result_combined[0]),
-						camColor.cam_getImgbytes(result_combined[1])	)
-		window['frame_0'].update(data=imgbytes[0])
-		window['frame_1'].update(data=imgbytes[1])
+		imgbytes_raw = (	camColor.cam_getImgbytes(result_raw[0], 200	),
+							camColor.cam_getImgbytes(result_raw[1], 200	)	)
+		imgbytes_combined = (	camColor.cam_getImgbytes(result_combined[0], 200	),
+								camColor.cam_getImgbytes(result_combined[1], 200	)	)
+		window["frame_raw_0"].update(data=imgbytes_raw[0])
+		window["frame_raw_1"].update(data=imgbytes_raw[1])
+		window["frame_combined_0"].update(data=imgbytes_combined[0])
+		window["frame_combined_1"].update(data=imgbytes_combined[1])
 		if event in (None, "Cancel"):
 			break
 
@@ -128,7 +133,7 @@ def main(isRunningCam = False):
 			camColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
 			break
 			
-	cubelets = mainCamera.cam_obtainCubelets(result_combined, result_color)
+	cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
 	cubeDisplay.printCube(cubelets)
 
 	cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
@@ -145,7 +150,9 @@ def main(isRunningCam = False):
 		event, values = window.read(timeout=0, timeout_key='timeout')
 		if event in (None, "Cancel"):
 			break
-
+		if event in ("Reset"):
+			window.close()
+			window = windowDefine()
 		if event in ("_movesProgress_"): # Displays cube changes throughout the solving algorithm
 			# Given valid slider values & is changing position
 			# Assumes cube is obtained & kociemba moves are valid

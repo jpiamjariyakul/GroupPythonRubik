@@ -13,7 +13,7 @@ import imgParse_camColor as camColor
 import time
 from copy import deepcopy
 
-import mainCamera
+import imgParse_initCam as initCam
 
 sg.theme("DarkBlack")
 
@@ -129,7 +129,7 @@ def main(isRunningCam = False):
 		elif event in ("_confirm_"):
 			camColor.cam_releaseCap(cap_0, cap_1)
 			print("ENGLISH MOTHERFUCKER DO YOU SPEAK IT")
-			cubelets = mainCamera.cam_obtainCubelets(result_combined, result_color)
+			cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
 			cubeDisplay.printCube(cubelets)
 			# Releases OCV once done!
 			cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube

@@ -12,8 +12,8 @@ def playAudio(frqc, ms):
 	def sine_wave(hz, amplitude=4096, sample_rate=44100):
 		# Compute N samples of a sine wave with given frequency and peak amplitude
 		# Number of samples per second == sample rate == 44.1k Hz
-		length = sample_rate / float(hz)
-		omega = np.pi * 2 / length
+		length = sample_rate / float(hz) # Sets sample length given sample rate
+		omega = np.pi * 2 / length # Obtain 
 		t = np.arange(int(length)) * omega
 		onecycle = amplitude * np.sin(t)
 		return (np.resize(onecycle, (sample_rate,)).astype(np.int16))
@@ -33,7 +33,7 @@ def audioInputSeq(ls_moves):# Receives list of moves
 		'U': 1.55303,	'R': 2.28267,
 		'F': 0.5034,	'D': 0.05034,
 		'L': 0.15247,	'B': 1.0707	}
-	ls_frqc = [float(dict_frqcFilter.get(moveCurrent) * 1000) for moveCurrent in ls_moves]
-	for frqcCurrent in ls_frqc: audioPlayMove(frqcCurrent)
+	ls_frqc = [float(dict_frqcFilter.get(moveCurrent) * 1000) for moveCurrent in ls_moves] # Maps moves in list to frequency (in kHz)
+	for frqcCurrent in ls_frqc: audioPlayMove(frqcCurrent) # Plays audio corresponding to moves in list
 
-audioInputSeq(['B', 'R', 'B'])
+#audioInputSeq(['B', 'R', 'B'])

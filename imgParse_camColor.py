@@ -67,6 +67,9 @@ def readFrame(cap, camera):
 				# Converts BGR to RGB
 				color_pixel = (color_pixel_temp[2], color_pixel_temp[1], color_pixel_temp[0])
 				img = cv2.circle(result_raw, coord_xy, dot_radius, (color_pixel), -1)
+				img = cv2.line(result_raw, (150, 150), (150, 300), (0,255,0), 2)
+				img = cv2.line(result_raw, (150, 150), (300, 87), (0,255,0), 2)
+				img = cv2.line(result_raw, (150, 150), (0, 87), (0,255,0), 2)
 	return result_raw, result_combined, result_color
 
 def cam_initCap():
@@ -85,8 +88,8 @@ def cam_obtain(cap_0, cap_1):
 	'''
 	return (result_raw_0, result_raw_1), (result_combined_0, result_combined_1), (result_color_0, result_color_1)
 
-def cam_getImgbytes(frame):
-	return cv2.imencode('.png', frame)[1].tobytes()
+def cam_getImgbytes(frame, size):
+	return cv2.imencode('.png', cv2.resize(frame, (size, size)))[1].tobytes()
 
 def cam_releaseCap(cap_0, cap_1):
 	cap_0.release()
