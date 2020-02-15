@@ -16,7 +16,7 @@ def checkColor(	hsv_combined,
 				hsv_white, hsv_red, hsv_orange,
 				hsv_yellow, hsv_green, hsv_blue):
 	# Only uses array values & not the images themselves
-	print("Howdy")
+	#print("Howdy")
 	if np.any(hsv_combined == hsv_red): return "R"
 	elif np.any(hsv_combined == hsv_orange): return "O"
 	elif np.any(hsv_combined == hsv_yellow): return "Y"

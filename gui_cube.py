@@ -1,5 +1,8 @@
-import PySimpleGUI as sg
+import time
+from copy import deepcopy
 import random
+
+import PySimpleGUI as sg
 
 import cubeGen_scramble as scramble
 import cubeGen_display as cubeDisplay
@@ -9,13 +12,10 @@ import solve_kocSolve as kocSolve
 from variables import dict_faceColor
 
 import imgParse_camColor as camColor
-
-import time
-from copy import deepcopy
-
 import imgParse_initCam as initCam
 
-sg.theme("DarkBlack")
+
+sg.theme("Reddit")
 
 CUBE_SIZE = 20
 FACE_SIZE = CUBE_SIZE * 3
@@ -23,17 +23,16 @@ FACE_SIZE = CUBE_SIZE * 3
 # For testing purposes - obtains new cube (scrambling optional)\
 def windowDefine():
 	# Define frames & its individual internal components
-	frame_cam_input = [
-		[	sg.Text("Click to run cameras", key="_textRunCam_"),
-			sg.Button("Get", key="_get_"),
-			sg.Button("Confirm", key="_confirm_", disabled=True)
-			] ]
-	frame_cam_img = [[	sg.Column([
-							[sg.Image(filename='', key='frame_0', size=(300, 300))],
-							[sg.Image(filename='', key='frame_1', size=(300, 300))]	
-							])	]]
-	frame_cam = [	[	sg.Column([	[sg.Frame('', frame_cam_input)],
-									[sg.Frame('', frame_cam_img)]	]	)	]	]
+	frame_cam = [	[	sg.Text("Click to run cameras", key="_textRunCam_", auto_size_text=True),
+						sg.Button("Get", key="_get_"),
+						sg.Button("Confirm", key="_confirm_", disabled=True)
+						],
+					[	sg.Column([		[	sg.Image(filename='', key="frame_raw_0", size=(200, 200)), 
+											sg.Image(filename='', key="frame_combined_0", size=(200, 200))	],
+										[	sg.Image(filename='', key="frame_raw_1", size=(200, 200)),
+											sg.Image(filename='', key="frame_combined_1", size=(200, 200))	]	
+									])	]
+									]
 
 	frame_cube =	[
 			[	sg.Graph((400, 400), (0, 180), (240, 0), pad=(20, 20), key="_net_", change_submits=True, drag_submits=False),
@@ -41,13 +40,12 @@ def windowDefine():
 				],
 			[	sg.Text("Index: "), sg.Text("?", key="_moveIndex_", size=(3, 1)),
 				sg.Slider(key="_movesProgress_", orientation="horizontal", disable_number_display=True, disabled=True, range=(0, 0), enable_events=True),
-				sg.Text("Current Move: "), sg.Text("?", key="_moveCurrent_", size=(4, 1))]
-		]
+				sg.Text("Current Move: "), sg.Text("?", key="_moveCurrent_", size=(4, 1))]	]
 	frame_button_bottom = [	[	sg.Button("Solve", disabled=True, key="_solve_"),
 								sg.Button("Fill"), sg.Button("Reset"), sg.Button("Cancel")
 								]	]
 	# Given defined frames, define layout of window
-	layout = [	[	sg.Frame("Howdy", frame_cam),
+	layout = [	[	sg.Frame("Camera Output", frame_cam),
 					sg.Column(	[	[sg.Frame("Net Representation", frame_cube)],
 									[sg.Frame("button_bottom", frame_button_bottom)]
 								])
@@ -94,106 +92,142 @@ def drawCubelets(window, cube):
 								)
 
 
-def main(isRunningCam = False):
-	#print("Making window")
+def main():
+	# Defines state machine verification
+	ls_state = [	"INIT", 
+					"CAM_GET", "CAM_SET",
+					"MOVES_GET_CAM",
+					"MOVES_SET", "MOVES_RUN", "FINISHED"	]
+	st_Curr, st_Prev = "INIT", "INIT"
+
 	window = windowDefine()
 	#cubeObtained = False
-	while True:
-		event, values = window.read()
-		if event in (None, "Cancel"):
-			break
-
-		if event in ("_get_"):
-			window["_textRunCam_"].update("Howdy bitches")
-			window["_get_"].update(disabled=True)
-			window["_confirm_"].update(disabled=False)
-			break
-	cap_0, cap_1 = camColor.cam_initCap()
-
-	while True:
+	while True: 
 		event, values = window.read(timeout=0, timeout_key='timeout')
-
-		result_raw, result_combined, result_color = camColor.cam_obtain(cap_0, cap_1)
-		imgbytes = (	camColor.cam_getImgbytes(result_combined[0]),
-						camColor.cam_getImgbytes(result_combined[1])	)
-		window['frame_0'].update(data=imgbytes[0])
-		window['frame_1'].update(data=imgbytes[1])
+		#event, values = window.read()
 		if event in (None, "Cancel"):
 			break
-
 		if event in ("Reset"):
 			window.close()
 			window = windowDefine()
-			#cubeObtained = False
+			st_Curr == "INIT"
 
-		elif event in ("_confirm_"):
-			camColor.cam_releaseCap(cap_0, cap_1)
-			print("ENGLISH MOTHERFUCKER DO YOU SPEAK IT")
-			cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
-			cubeDisplay.printCube(cubelets)
-			# Releases OCV once done!
-			cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
-			drawCubelets(window, cube)
-			window["_confirm_"].update(disabled=True)
-			ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-			window["_listMoves_"].update(disabled=False, values=str_kocSolve)
-			print(ls_kocSolve)
-			#if sz != movesStatus:
-			cubeObtained = True
-			window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
-			window["_solve_"].update(disabled=False)
-			cubeDisplay.printCube(cube)
+		if (st_Curr in ls_state) and (st_Prev in ls_state):
+			###	Given launch, waits for user input to method of obtaining moves
+			if st_Curr == "INIT": # State: Idle-waiting to initialise camera
+				if (st_Curr != st_Prev): # Should not enter here if working properly
+					print("States: " + st_Curr + ", " + st_Prev)
+					st_Prev = st_Curr
+				if event in ("_get_"):
+					window["_textRunCam_"].update("Press [CONFIRM] to confirm camera input")
+					window["_get_"].update(disabled=True)
+					window["_confirm_"].update(disabled=False)
+					st_Curr = "CAM_GET"
 
+			###	Given request, sets up camera to obtain images
+			elif st_Curr == "CAM_GET": # State: Runs cameras & obtains pictures
+				if (st_Curr != st_Prev): # Should come from "INIT"
+					cap_0, cap_1 = camColor.cam_initCap()
+					st_Prev = st_Curr
+				#print("States: " + st_Curr + ", " + st_Prev)
+				result_raw, result_combined, result_color = camColor.cam_obtain(cap_0, cap_1)
+				imgbytes_raw = (	camColor.cam_getImgbytes(result_raw[0], 200	),
+									camColor.cam_getImgbytes(result_raw[1], 200	)	)
+				imgbytes_combined = (	camColor.cam_getImgbytes(result_combined[0], 200	),
+										camColor.cam_getImgbytes(result_combined[1], 200	)	)
+				window["frame_raw_0"].update(data=imgbytes_raw[0])
+				window["frame_raw_1"].update(data=imgbytes_raw[1])
+				window["frame_combined_0"].update(data=imgbytes_combined[0])
+				window["frame_combined_1"].update(data=imgbytes_combined[1])
+				if event in ("_confirm_"):
+					st_Curr = "CAM_SET"
+					
+			###	Given camera confirmation, obtains cubelets from such images
+			elif st_Curr == "CAM_SET":
+				if (st_Curr != st_Prev): # Should come from "CAM_GET"
+					camColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
+					cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
+					cubeDisplay.printCube(cubelets)
+					st_Prev = st_Curr
+				cube = getNew.obtainVirCube(50000) # Debug purposes - generates new cube
+				# Replace above line w/ verification of camera-obtained cubelet
+				st_Curr = "MOVES_GET_CAM"
+			
+			###	Given cube parsed from images, evaluates moves from camera
+			elif st_Curr == "MOVES_GET_CAM":
+				if (st_Curr != st_Prev):
+					ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+					ls_runMoves = ls_kocSolve
+					print(ls_runMoves)
+					cubeDisplay.printCube(cube)
+					st_Prev = st_Curr
+				st_Curr = "MOVES_SET"
 
-		# elif event in ("_confirm_"):
-		# 	cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
-		# 	drawCubelets(window, cube)
-		# 	window["_confirm_"].update(disabled=True)
-		# 	ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-		# 	window["_listMoves_"].update(disabled=False, values=str_kocSolve)
-		# 	print(ls_kocSolve)
-		# 	#if sz != movesStatus:
-		# 	cubeObtained = True
-		# 	window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
-		# 	window["_solve_"].update(disabled=False)
-		# 	cubeDisplay.printCube(cube)
-		elif event in ("Fill"):
-			print("Color filled!")
-		elif event in ("_solve_"):
-			# Once in this event, no termination permitted until solving is finished
-			#print(ls_kocSolve)
-			window["_movesProgress_"].update(disabled=True)
-			window["_solve_"].update(disabled=True)
-			drawCubelets(window, cube)
-			for moveCurrent in ls_kocSolve:
-				#input("Solving " + moveCurrent[0])
-				for i in range(moveCurrent[1]):
-					cube = scramble.moveFace(moveCurrent[0], cube)
-				drawCubelets(window, cube)
-	
-	
-		if event in (None, "Cancel"):
+			###	Given set of moves, prep program to run moves, including simulation
+			elif st_Curr == "MOVES_SET":
+				if (st_Curr != st_Prev): # Should come from "CAM_SET"
+					drawCubelets(window, cube)
+					window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+					window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
+					window["_confirm_"].update(disabled=True)
+					window["_solve_"].update(disabled=False)
+					window["_moveCurrent_"].update("None")
+					window["_moveIndex_"].update(0)
+					st_Prev = st_Curr
+				''' Given input into slider, simulates cube turning
+				'''
+				if event in ("_movesProgress_"): # Displays cube changes throughout the solving algorithm
+					# Given valid slider values & is changing position
+					# Assumes cube is obtained & kociemba moves are valid
+					cube_disp = deepcopy(cube)
+
+					# If position is 0, show default
+					# If position is 1, show [0]
+					# If position is 2, show [0] + [1]
+					# ...
+
+					indexMove = int(values["_movesProgress_"]) # Given float value of slider
+					window["_moveIndex_"].update(str(indexMove))
+					window["_moveCurrent_"].update("None")
+					if (indexMove > 0): # Considers moves beyond default cube
+						window["_moveCurrent_"].update(str(str_kocSolve[indexMove - 1]))
+						for moveCurrent in range(indexMove):
+							for i in range(ls_runMoves[moveCurrent][1]):
+								cube_disp = scramble.moveFace(ls_runMoves[moveCurrent][0], cube_disp)
+					drawCubelets(window, cube_disp)
+				elif event in ("_solve_"):
+					# Once in this event, no termination permitted until solving is finished
+					st_Curr = "MOVES_RUN"
+			
+			###	Given user confirmation to run moves, runs such moves
+			elif st_Curr == "MOVES_RUN":
+				if (st_Curr != st_Prev): # Should come from "MOVES_SET"
+					window["_movesProgress_"].update(disabled=True)
+					window["_solve_"].update(disabled=True)
+					drawCubelets(window, cube)
+				for index in range(len(ls_runMoves)):
+					moveCurrent = ls_runMoves[index]
+					window["_movesProgress_"].update(value=(index + 1))
+					window["_moveIndex_"].update(str(index + 1))
+					window["_moveCurrent_"].update(str(str_kocSolve[index]))
+					#print(index + 1)
+					for i in range(moveCurrent[1]):
+						cube = scramble.moveFace(moveCurrent[0], cube)
+						# TODO: Audio - output per file
+					drawCubelets(window, cube)
+					window.refresh()
+				st_Curr = "FINISHED"
+
+			### Given move completion, affirm with message
+			elif st_Curr == "FINISHED":
+				if (st_Curr != st_Prev): # Should come from "MOVES_RUN"
+					print("DONE!!")
+					st_Prev = st_Curr
+				st_Curr = "INIT"
+				
+		else: # Given invalid state
+			print("Invalid state! - Exiting")
 			break
-		
-		if event in ("_movesProgress_"): # Displays cube changes throughout the solving algorithm
-			# Given valid slider values & is changing position
-			# Assumes cube is obtained & kociemba moves are valid
-			cube_disp = deepcopy(cube)
-
-			# If position is 0, show default
-			# If position is 1, show [0]
-			# If position is 2, show [0] + [1]
-			# ...
-
-			indexMove = int(values["_movesProgress_"]) # Given float value of slider
-			window["_moveIndex_"].update(str(indexMove))
-			window["_moveCurrent_"].update("None")
-			if (indexMove > 0): # Considers moves beyond default cube
-				window["_moveCurrent_"].update(str(str_kocSolve[indexMove - 1]))
-				for moveCurrent in range(indexMove):
-					for i in range(ls_kocSolve[moveCurrent][1]):
-						cube_disp = scramble.moveFace(ls_kocSolve[moveCurrent][0], cube_disp)
-			drawCubelets(window, cube_disp)
 	window.close() # GUI loop exited - destroy window
 
 main()
