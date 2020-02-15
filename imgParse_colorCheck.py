@@ -81,8 +81,8 @@ def verifyColor(	camera, face, row, column, c_combined,
 							color = "?"
 							break
 					else: i += 1
-			#print("Color at (" + str(camera) + ", " + str(coord_row + j) + ", " + str(coord_col + i) + "): " + str(color))
-	print("Camera: " + str(camera) + ", Face: " + str(face) + ", Coord: (" + str(row) + " " + str(column) + ") = " + str(color))
+	#print("Camera: " + str(camera) + ", Face: " + str(face) + ", Coord: (" + str(row) + " " + str(column) + ") = " + str(color))
 	if color is None:
-		color = "FUCK"
+		color = "X"
+		print("Error at Camera: " + str(camera) + ", Face: " + str(face) + ", Coord: (" + str(row) + " " + str(column) + ") = " + str(color))
 	return color

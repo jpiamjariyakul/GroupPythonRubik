@@ -94,6 +94,10 @@ def drawCubelets(window, cube):
 
 def main():
 	# Defines state machine verification
+	ls_state = [	"INIT", 
+					"CAM_GET", "CAM_SET",
+					"MOVES_GET_CAM",
+					"MOVES_SET", "MOVES_RUN", "FINISHED"	]
 	st_Curr, st_Prev = "INIT", "INIT"
 
 	window = windowDefine()
@@ -106,87 +110,115 @@ def main():
 		if event in ("Reset"):
 			window.close()
 			window = windowDefine()
+			st_Curr == "INIT"
 
-		# if (st_Curr != st_Prev):
-		# 	st_Curr = checkState(st_Prev)
+		if (st_Curr in ls_state) and (st_Prev in ls_state):
+			###	Given launch, waits for user input to method of obtaining moves
+			if st_Curr == "INIT": # State: Idle-waiting to initialise camera
+				if (st_Curr != st_Prev): # Should not enter here if working properly
+					print("States: " + st_Curr + ", " + st_Prev)
+					st_Prev = st_Curr
+				if event in ("_get_"):
+					window["_textRunCam_"].update("Howdy bitches")
+					window["_get_"].update(disabled=True)
+					window["_confirm_"].update(disabled=False)
+					st_Curr = "CAM_GET"
 
-		if st_Curr == "INIT": # State 1 - Waiting to initialise camera
-			if (st_Curr != st_Prev): # Should not enter here if working properly
-				print("States: " + st_Curr + ", " + st_Prev)
-				st_Prev = st_Curr
-			if event in ("_get_"):
-				window["_textRunCam_"].update("Howdy bitches")
-				window["_get_"].update(disabled=True)
-				window["_confirm_"].update(disabled=False)
-				st_Curr = "CAM_GET"
+			###	Given request, sets up camera to obtain images
+			elif st_Curr == "CAM_GET": # State: Runs cameras & obtains pictures
+				if (st_Curr != st_Prev): # Should come from "INIT"
+					cap_0, cap_1 = camColor.cam_initCap()
+					st_Prev = st_Curr
+				#print("States: " + st_Curr + ", " + st_Prev)
+				result_raw, result_combined, result_color = camColor.cam_obtain(cap_0, cap_1)
+				imgbytes_raw = (	camColor.cam_getImgbytes(result_raw[0], 200	),
+									camColor.cam_getImgbytes(result_raw[1], 200	)	)
+				imgbytes_combined = (	camColor.cam_getImgbytes(result_combined[0], 200	),
+										camColor.cam_getImgbytes(result_combined[1], 200	)	)
+				window["frame_raw_0"].update(data=imgbytes_raw[0])
+				window["frame_raw_1"].update(data=imgbytes_raw[1])
+				window["frame_combined_0"].update(data=imgbytes_combined[0])
+				window["frame_combined_1"].update(data=imgbytes_combined[1])
+				if event in ("_confirm_"):
+					st_Curr = "CAM_SET"
+					
+			###	Given camera confirmation, obtains cubelets from such images
+			elif st_Curr == "CAM_SET":
+				if (st_Curr != st_Prev): # Should come from "CAM_GET"
+					camColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
+					cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
+					cubeDisplay.printCube(cubelets)
+					st_Prev = st_Curr
+				cube = getNew.obtainVirCube(50) # Debug purposes - generates new cube
+				# Replace above line w/ verification of camera-obtained cubelet
+				st_Curr = "MOVES_GET_CAM"
+			
+			###	Given cube parsed from images, evaluates moves from camera
+			elif st_Curr == "MOVES_GET_CAM":
+				if (st_Curr != st_Prev):
+					ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+					ls_runMoves = ls_kocSolve
+					print(ls_runMoves)
+					cubeDisplay.printCube(cube)
+					st_Prev = st_Curr
+				st_Curr = "MOVES_SET"
 
-		elif st_Curr == "CAM_GET":
-			if (st_Curr != st_Prev): # Should come from "INIT"
-				cap_0, cap_1 = camColor.cam_initCap()
-				print("States: " + st_Curr + ", " + st_Prev)
-				st_Prev = st_Curr
+			###	Given set of moves, prep program to run moves, including simulation
+			elif st_Curr == "MOVES_SET":
+				if (st_Curr != st_Prev): # Should come from "CAM_SET"
+					drawCubelets(window, cube)
+					window["_listMoves_"].update(disabled=False, values=str_kocSolve)
+					window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
+					window["_confirm_"].update(disabled=True)
+					window["_solve_"].update(disabled=False)
+					st_Prev = st_Curr
+				''' Given input into slider, simulates cube turning
+				'''
+				if event in ("_movesProgress_"): # Displays cube changes throughout the solving algorithm
+					# Given valid slider values & is changing position
+					# Assumes cube is obtained & kociemba moves are valid
+					cube_disp = deepcopy(cube)
 
-			result_raw, result_combined, result_color = camColor.cam_obtain(cap_0, cap_1)
-			imgbytes_raw = (	camColor.cam_getImgbytes(result_raw[0], 200	),
-								camColor.cam_getImgbytes(result_raw[1], 200	)	)
-			imgbytes_combined = (	camColor.cam_getImgbytes(result_combined[0], 200	),
-									camColor.cam_getImgbytes(result_combined[1], 200	)	)
-			window["frame_raw_0"].update(data=imgbytes_raw[0])
-			window["frame_raw_1"].update(data=imgbytes_raw[1])
-			window["frame_combined_0"].update(data=imgbytes_combined[0])
-			window["frame_combined_1"].update(data=imgbytes_combined[1])
-			if event in ("_confirm_"):
-				camColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
-				st_Curr = "CAM_SET"
-				
-		elif st_Curr == "CAM_SET":
-			if (st_Curr != st_Prev): # Should come from "CAM_GET"
-				cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
-				cubeDisplay.printCube(cubelets)
-				cube = getNew.obtainVirCube(20) # Debug purposes - generates new cube
-				drawCubelets(window, cube)
-				window["_confirm_"].update(disabled=True)
-				ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-				window["_listMoves_"].update(disabled=False, values=str_kocSolve)
-				print(ls_kocSolve)
-				window["_movesProgress_"].update(disabled=False, range=(0, len(str_kocSolve)))
-				window["_solve_"].update(disabled=False)
-				cubeDisplay.printCube(cube)
-				st_Prev = st_Curr
-			if event in ("_movesProgress_"): # Displays cube changes throughout the solving algorithm
-				# Given valid slider values & is changing position
-				# Assumes cube is obtained & kociemba moves are valid
-				cube_disp = deepcopy(cube)
+					# If position is 0, show default
+					# If position is 1, show [0]
+					# If position is 2, show [0] + [1]
+					# ...
 
-				# If position is 0, show default
-				# If position is 1, show [0]
-				# If position is 2, show [0] + [1]
-				# ...
-
-				indexMove = int(values["_movesProgress_"]) # Given float value of slider
-				window["_moveIndex_"].update(str(indexMove))
-				window["_moveCurrent_"].update("None")
-				if (indexMove > 0): # Considers moves beyond default cube
-					window["_moveCurrent_"].update(str(str_kocSolve[indexMove - 1]))
-					for moveCurrent in range(indexMove):
-						for i in range(ls_kocSolve[moveCurrent][1]):
-							cube_disp = scramble.moveFace(ls_kocSolve[moveCurrent][0], cube_disp)
-				drawCubelets(window, cube_disp)
-			elif event in ("_solve_"):
-				# Once in this event, no termination permitted until solving is finished
-				window["_movesProgress_"].update(disabled=True)
-				window["_solve_"].update(disabled=True)
-				drawCubelets(window, cube)
-				for moveCurrent in ls_kocSolve:
+					indexMove = int(values["_movesProgress_"]) # Given float value of slider
+					window["_moveIndex_"].update(str(indexMove))
+					window["_moveCurrent_"].update("None")
+					if (indexMove > 0): # Considers moves beyond default cube
+						window["_moveCurrent_"].update(str(str_kocSolve[indexMove - 1]))
+						for moveCurrent in range(indexMove):
+							for i in range(ls_runMoves[moveCurrent][1]):
+								cube_disp = scramble.moveFace(ls_runMoves[moveCurrent][0], cube_disp)
+					drawCubelets(window, cube_disp)
+				elif event in ("_solve_"):
+					# Once in this event, no termination permitted until solving is finished
+					st_Curr = "MOVES_RUN"
+			
+			###	Given user confirmation to run moves, runs such moves
+			elif st_Curr == "MOVES_RUN":
+				if (st_Curr != st_Prev): # Should come from "MOVES_SET"
+					window["_movesProgress_"].update(disabled=True)
+					window["_solve_"].update(disabled=True)
+					drawCubelets(window, cube)
+				for moveCurrent in ls_runMoves:
 					for i in range(moveCurrent[1]):
 						cube = scramble.moveFace(moveCurrent[0], cube)
 					drawCubelets(window, cube)
-				st_Curr = "SOLVE_DONE"
-		elif st_Curr == "SOLVE_DONE":
-			if (st_Curr != st_Prev): # Should come from "CAM_SET"
-				print("DONE!!")
-				st_Prev = st_Curr
-			st_Curr = "INIT"
+					window.refresh()
+				st_Curr = "FINISHED"
+
+			### Given move completion, affirm with message
+			elif st_Curr == "FINISHED":
+				if (st_Curr != st_Prev): # Should come from "MOVES_RUN"
+					print("DONE!!")
+					st_Prev = st_Curr
+				st_Curr = "INIT"
+		else: # Given invalid state
+			print("Invalid state! - Exiting")
+			break
 	window.close() # GUI loop exited - destroy window
 
 main()
