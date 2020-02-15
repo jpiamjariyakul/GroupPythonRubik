@@ -34,6 +34,8 @@ def audioInputSeq(ls_moves):# Receives list of moves
 		'F': 0.5034,	'D': 0.05034,
 		'L': 0.15247,	'B': 1.0707	}
 	ls_frqc = [float(dict_frqcFilter.get(moveCurrent) * 1000) for moveCurrent in ls_moves] # Maps moves in list to frequency (in kHz)
-	for frqcCurrent in ls_frqc: audioPlayMove(frqcCurrent) # Plays audio corresponding to moves in list
+	for frqcCurrent in ls_frqc:
+		print("Playing audio for motor " + str(ls_moves))
+		audioPlayMove(frqcCurrent) # Plays audio corresponding to moves in list
 
 #audioInputSeq(['B', 'R', 'B'])

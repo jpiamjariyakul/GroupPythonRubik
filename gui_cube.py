@@ -14,6 +14,7 @@ from variables import dict_faceColor
 import imgParse_camColor as camColor
 import imgParse_initCam as initCam
 
+import audio_waveSine as waveSine
 
 sg.theme("Reddit")
 
@@ -117,17 +118,17 @@ def main():
 			###	Given launch, waits for user input to method of obtaining moves
 			if st_Curr == "INIT": # State: Idle-waiting to initialise camera
 				if (st_Curr != st_Prev): # Should not enter here if working properly
-					print("States: " + st_Curr + ", " + st_Prev)
+					#print("States: " + st_Curr + ", " + st_Prev)
 					st_Prev = st_Curr
 				if event in ("_get_"):
-					window["_textRunCam_"].update("Press [CONFIRM] to confirm camera input")
-					window["_get_"].update(disabled=True)
-					window["_confirm_"].update(disabled=False)
 					st_Curr = "CAM_GET"
 
 			###	Given request, sets up camera to obtain images
 			elif st_Curr == "CAM_GET": # State: Runs cameras & obtains pictures
 				if (st_Curr != st_Prev): # Should come from "INIT"
+					window["_textRunCam_"].update("Press [CONFIRM] to confirm camera input")
+					window["_get_"].update(disabled=True)
+					window["_confirm_"].update(disabled=False)
 					cap_0, cap_1 = camColor.cam_initCap()
 					st_Prev = st_Curr
 				#print("States: " + st_Curr + ", " + st_Prev)
@@ -157,11 +158,11 @@ def main():
 			###	Given cube parsed from images, evaluates moves from camera
 			elif st_Curr == "MOVES_GET_CAM":
 				if (st_Curr != st_Prev):
-					ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
-					ls_runMoves = ls_kocSolve
-					print(ls_runMoves)
-					cubeDisplay.printCube(cube)
 					st_Prev = st_Curr
+				ls_kocSolve, str_kocSolve = kocSolve.solveCubeKoc(kocSolve.parseCubeString(cube))
+				ls_runMoves = ls_kocSolve
+				print(ls_runMoves)
+				cubeDisplay.printCube(cube)
 				st_Curr = "MOVES_SET"
 
 			###	Given set of moves, prep program to run moves, including simulation
@@ -215,6 +216,7 @@ def main():
 					for i in range(moveCurrent[1]):
 						cube = scramble.moveFace(moveCurrent[0], cube)
 						# TODO: Audio - output per file
+						waveSine.audioInputSeq(moveCurrent[0])
 					drawCubelets(window, cube)
 					window.refresh()
 				st_Curr = "FINISHED"
@@ -222,7 +224,7 @@ def main():
 			### Given move completion, affirm with message
 			elif st_Curr == "FINISHED":
 				if (st_Curr != st_Prev): # Should come from "MOVES_RUN"
-					print("DONE!!")
+					print("DONE!")
 					st_Prev = st_Curr
 				st_Curr = "INIT"
 				
