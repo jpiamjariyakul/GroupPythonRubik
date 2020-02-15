@@ -94,6 +94,8 @@ def drawCubelets(window, cube):
 
 def main():
 	#print("Making window")
+	st_Current, st_Next = "INIT", "INIT"
+
 	window = windowDefine()
 	#cubeObtained = False
 	while True: # State 1 - Waiting to initialise camera
