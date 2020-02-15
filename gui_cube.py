@@ -51,7 +51,6 @@ def windowDefine():
 								])
 				]	]
 	def graphDefine(window):
-		#g = window["_net_"]
 		for face_row in range(3):
 			for face_col in range(4):
 				if (face_col == 1) or (face_row == 1):
@@ -61,10 +60,9 @@ def windowDefine():
 											((face_row * FACE_SIZE) + FACE_SIZE)	),
 										line_color="black"
 									)
-		#return g
 	window = sg.Window("Window Title", layout,finalize=True)
 	graphDefine(window)
-	return window # , g
+	return window
 
 def drawCubelets(window, cube):
 	for face in range(6):
@@ -98,20 +96,23 @@ def main():
 					"CAM_GET", "CAM_SET",
 					"MOVES_GET_CAM",
 					"MOVES_SET", "MOVES_RUN", "FINISHED"	]
-	st_Curr, st_Prev = "INIT", "INIT"
+	st_Curr, st_Prev = "INIT", "INIT" # Defines startup states
 
-	window = windowDefine()
-	#cubeObtained = False
+	window = windowDefine() # Sets window to defined layout
+
 	while True: 
+		# Reads events & values in window, provided certain small update & delay
 		event, values = window.read(timeout=0, timeout_key='timeout')
-		#event, values = window.read()
-		if event in (None, "Cancel"):
+
+		## Global events - applicable to all states (given user being able to input)
+		if event in (None, "Cancel"): # Given cancel clicked, exits program
 			break
-		if event in ("Reset"):
+		if event in ("Reset"): # Given reset clicked, goes back to initial state
 			window.close()
 			window = windowDefine()
 			st_Curr == "INIT"
 
+		## Program only runs if states are in list of valid states
 		if (st_Curr in ls_state) and (st_Prev in ls_state):
 			###	Given launch, waits for user input to method of obtaining moves
 			if st_Curr == "INIT": # State: Idle-waiting to initialise camera
@@ -149,7 +150,7 @@ def main():
 					cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
 					cubeDisplay.printCube(cubelets)
 					st_Prev = st_Curr
-				cube = getNew.obtainVirCube(50000) # Debug purposes - generates new cube
+				cube = getNew.obtainVirCube(50) # Debug purposes - generates new cube
 				# Replace above line w/ verification of camera-obtained cubelet
 				st_Curr = "MOVES_GET_CAM"
 			
@@ -225,9 +226,13 @@ def main():
 					st_Prev = st_Curr
 				st_Curr = "INIT"
 				
+			else: # Given invalid state
+				print("Invalid state! - Exiting")
+				break
 		else: # Given invalid state
 			print("Invalid state! - Exiting")
 			break
 	window.close() # GUI loop exited - destroy window
 
-main()
+if __name__ == "__main__":
+	main()
