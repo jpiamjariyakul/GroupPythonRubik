@@ -1,6 +1,6 @@
 ### Imports prerequisites & libraries
 import imgParse_colorCheck as colorCheck
-import imgParse_camColor as camColor
+import imgParse_getColor as camColor
 import cubeGen_display as cubeDisplay
 
 from variables import dict_colorFace

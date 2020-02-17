@@ -1,9 +1,7 @@
 '''
 Order of Kociemba algorithm input is in following order: URFDLB
 One sets UP color as WHITE - change according to necessary
-'''
 
-'''
 Program maps 	WHITE	to	UP
 				GREEN	to	RIGHT
 				ORANGE	to	FRONT

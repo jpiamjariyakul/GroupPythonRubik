@@ -66,10 +66,15 @@ def readFrame(cap, camera):
 				color_pixel_temp = dict_colorRGB.get(dict_faceColor.get(cubeDir[camera][face]))
 				# Converts BGR to RGB
 				color_pixel = (color_pixel_temp[2], color_pixel_temp[1], color_pixel_temp[0])
-				img = cv2.circle(result_raw, coord_xy, dot_radius, (color_pixel), -1)
-				img = cv2.line(result_raw, (150, 150), (150, 300), (0,255,0), 2)
-				img = cv2.line(result_raw, (150, 150), (300, 87), (0,255,0), 2)
-				img = cv2.line(result_raw, (150, 150), (0, 87), (0,255,0), 2)
+				cv2.circle(result_raw, coord_xy, dot_radius, (color_pixel), -1)
+				if camera == 0:
+					cv2.line(result_raw, (150, 150), (150, 300), (0,255,0), 2)
+					cv2.line(result_raw, (150, 150), (300, 87), (0,255,0), 2)
+					cv2.line(result_raw, (150, 150), (0, 87), (0,255,0), 2)
+				elif camera == 1:
+					cv2.line(result_raw, (150, 150), (150, 0), (0,255,0), 2)
+					cv2.line(result_raw, (150, 150), (300, 213), (0,255,0), 2)
+					cv2.line(result_raw, (150, 150), (0, 213), (0,255,0), 2)
 	return result_raw, result_combined, result_color
 
 def cam_initCap():

@@ -24,7 +24,7 @@ def playAudio(frqc, ms):
 	sound.stop() # Stops the sound
 
 def audioPlayMove(frqcCurrent):
-	duration = int(1000) # Duration of audio in ms
+	duration = int(50) # Duration of audio in ms
 	pygame.mixer.init(channels=1) # Sets audio to output in channel 1
 	playAudio(frqcCurrent, duration)
 
