@@ -32,7 +32,7 @@ def audioInputSeq(ls_moves):# Receives list of moves
 	dict_frqcFilter = { # All of these values are in kHz
 		# 'U': 1.55303,	'R': 2.28267,
 		# 'F': 0.5034,	'D': 0.05034,
-		# 'L': 0.15247,	'B': 1.0707	}
+		# 'L': 0.15247,	'B': 1.0707
 		'U': 00.5,	'R': 04.5,
 		'F': 08.5,	'D': 12.5,
 		'L': 16.5,	'B': 20.5	}

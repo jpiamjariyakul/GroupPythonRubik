@@ -75,11 +75,13 @@ def windowDefine():
 			for face_col in range(4):
 				if (face_col == 1) or (face_row == 1):
 					window["_net_"].draw_rectangle(	(	(face_col * FACE_SIZE), 
-											(face_row * FACE_SIZE)	),
-										(	((face_col * FACE_SIZE) + FACE_SIZE), 
-											((face_row * FACE_SIZE) + FACE_SIZE)	),
-										line_color="black"
-									)
+														(face_row * FACE_SIZE)
+														),
+													(	((face_col * FACE_SIZE) + FACE_SIZE), 
+														((face_row * FACE_SIZE) + FACE_SIZE)
+														),
+													line_color="black"
+													)
 	window = sg.Window("Window Title", layout, finalize=True, return_keyboard_events=True, use_default_focus=False)
 	graphDefine(window)
 	return window
@@ -100,14 +102,17 @@ def drawCubelets(window, cube):
 										'O': "orange",
 										'Y': "yellow",
 										'G': "green",
-										'B': "blue"		}
+										'B': "blue"
+										}
 				colorCube = dict_colorAbbrev.get(dict_faceColor.get(cube[face][cube_row][cube_col]))
 				window["_net_"].draw_rectangle(	(	(FACE_SIZE * coordFace[0]) + (cube_col * CUBE_SIZE), 
-										(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	),
-									(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
-										(FACE_SIZE * coordFace[1]) + ((cube_row * CUBE_SIZE) + CUBE_SIZE)	),
-									fill_color=colorCube
-								)
+													(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	
+													),
+												(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
+													(FACE_SIZE * coordFace[1]) + ((cube_row * CUBE_SIZE) + CUBE_SIZE)
+													),
+												fill_color=colorCube
+												)
 
 
 def main(): # Implements each stage of GUI progression with state machine
@@ -116,12 +121,18 @@ def main(): # Implements each stage of GUI progression with state machine
 					"CAM_IDLE", "CAM_GET", "CAM_SET",
 					"ASC_IDLE", "ASC_GET", "ASC_SET",
 					"MOVES_GET_CAM", "MOVES_GET_ASC",
-					"MOVES_SET", "MOVES_RUN", "DONE"	]
+					"MOVES_SET", "MOVES_RUN", "DONE"
+					]
 	st_Prev, st_Curr = "DONE", "INIT" # Defines startup states
 
 	window = windowDefine() # Sets window to defined layout
 	while True: 
 		# Reads events & values in window, provided certain small update & delay
+
+		# v_timeout = None
+		# if (st_Curr == "CAM_GET") or (st_Curr == "MOVES_GET_CAM"): v_timeout = 0
+		# event, values = window.read(timeout=v_timeout, timeout_key='timeout')
+
 		event, values = window.read(timeout=0, timeout_key='timeout')
 		if (st_Curr != st_Prev):
 			print("States: " + st_Curr + ", " + st_Prev)
