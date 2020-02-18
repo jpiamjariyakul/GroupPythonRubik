@@ -24,7 +24,7 @@ def playAudio(frqc, ms):
 	sound.stop() # Stops the sound
 
 def audioPlayMove(frqcCurrent):
-	duration = int(50) # Duration of audio in ms
+	duration = int(5000) # Duration of audio in ms
 	pygame.mixer.init(channels=1) # Sets audio to output in channel 1
 	playAudio(frqcCurrent, duration)
 
@@ -39,7 +39,7 @@ def audioInputSeq(ls_moves):# Receives list of moves
 	ls_frqc = [float(dict_frqcFilter.get(moveCurrent) * 1000) for moveCurrent in ls_moves] # Maps moves in list to frequency (in kHz)
 	#print(ls_frqc)
 	for frqcCurrent in ls_frqc:
-		print("Playing audio for motor " + str(ls_moves))
+		print("Playing audio for motor corresponding to " + str(frqcCurrent) + " Hz")
 		audioPlayMove(frqcCurrent) # Plays audio corresponding to moves in list
 
-#audioInputSeq(['B', 'R', 'B'])
+#audioInputSeq(['U'])
