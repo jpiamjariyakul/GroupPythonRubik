@@ -117,7 +117,7 @@ def main(): # Implements each stage of GUI progression with state machine
 					"ASC_IDLE", "ASC_GET", "ASC_SET",
 					"MOVES_GET_CAM", "MOVES_GET_ASC",
 					"MOVES_SET", "MOVES_RUN", "DONE"	]
-	st_Prev, st_Curr = "INIT", "INIT" # Defines startup states
+	st_Prev, st_Curr = "DONE", "INIT" # Defines startup states
 
 	window = windowDefine() # Sets window to defined layout
 	while True: 
@@ -146,6 +146,7 @@ def main(): # Implements each stage of GUI progression with state machine
 				if (st_Curr != st_Prev): # Should not enter here if working properly
 					window["_input_file_"].update(disabled=True)
 					window["_confirm_file_"].update(disabled=True)
+					window["_file_ascii_"].update(disabled=True)
 					window["_input_cam_"].update(disabled=True)
 					window["_confirm_cam_"].update(disabled=True)
 					window["_radio_ascii_"].update(disabled=False)
@@ -230,6 +231,7 @@ def main(): # Implements each stage of GUI progression with state machine
 				if (st_Curr != st_Prev):
 					window["_confirm_file_"].update(disabled=False)
 					window["_input_file_"].update(disabled=False)
+					window["_file_ascii_"].update(disabled=False)
 					st_Prev = st_Curr
 				if event in ("_confirm_file_"): #f=open("guru99.txt", "r")
 					st_Curr = "ASC_SET"
@@ -239,6 +241,7 @@ def main(): # Implements each stage of GUI progression with state machine
 				st_Prev = st_Curr
 				window["_confirm_file_"].update(disabled=True)
 				window["_input_file_"].update(disabled=True)
+				window["_file_ascii_"].update(disabled=True)
 				fileMixup = open(str(values["_file_ascii_"]), 'r')
 				str_Mixup = fileMixup.read()
 				st_Curr = "MOVES_GET_ASC"
