@@ -150,7 +150,7 @@ def main(): # Implements each stage of GUI progression with state machine
 		## Global events - applicable to all states (given user being able to input)
 		if event in (None, "_btn_terminate_"): # Given cancel clicked, exits program
 			break
-		if event in ("_btn_reset_"): # Given reset clicked, goes back to initial state
+		if event in ("_btn_reset_") and (st_Curr != "CAM_GET"): # Given reset clicked, goes back to initial state
 			st_Curr = "INIT"
 			window.close()
 			window = windowDefine()
@@ -226,6 +226,8 @@ def main(): # Implements each stage of GUI progression with state machine
 					window["frame_raw_1"].update(data=None)
 					window["frame_combined_0"].update(data=None)
 					window["frame_combined_1"].update(data=None)
+					window.close()
+					window = windowDefine()
 					st_Curr = "INIT"
 			###	Given camera confirmation, obtains cubelets from such images
 			elif st_Curr == "CAM_SET":
