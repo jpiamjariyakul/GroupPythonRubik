@@ -245,7 +245,7 @@ def main(): # Implements each stage of GUI progression with state machine
 				st_Curr = "MOVES_SET"
 
 			## ------------------------------------------------------------------------
-			## Refers to ASCII-related inputs
+			### Refers to ASCII-related inputs
 			elif st_Curr == "ASC_IDLE":
 				window["frame_raw_0"].update(data=None)
 				window["frame_raw_1"].update(data=None)
@@ -326,15 +326,19 @@ def main(): # Implements each stage of GUI progression with state machine
 					window["_txt_moveIndex_"].update(str(index + 1))
 					window["_txt_moveCurrent_"].update(str(str_runMoves[index]))
 					#print(index + 1)
-					for i in range(moveCurrent[1]):
-						cube = scramble.moveFace(moveCurrent[0], cube)
-						# TODO: Audio - output per file
-						waveSine.audioInputSeq(moveCurrent[0])
+					# for i in range(moveCurrent[1]):
+					# 	cube = scramble.moveFace(moveCurrent[0], cube)
+					# 	# Audio - output per file
+					# 	waveSine.audioInputSeq(moveCurrent[0])
+					# Audio output of specific frequencies corresponding to face
+					waveSine.audioInputSeq([moveCurrent])
+					# Rotates & displays cube given mode
+					for i in range(moveCurrent[1]): cube = scramble.moveFace(moveCurrent[0], cube)
 					drawCubelets(window, cube)
 					window.refresh()
 				st_Curr = "DONE"
 
-			### Given move completion, affirm with message
+			### Given move completion, affirm with completion message
 			elif st_Curr == "DONE":
 				print("DONE!")
 				st_Curr = "INIT"
@@ -370,7 +374,8 @@ def main(): # Implements each stage of GUI progression with state machine
 				print("Rotating face " + move_mnl)
 				cube = scramble.moveFace(move_mnl, cube)
 				drawCubelets(window, cube)
-				waveSine.audioInputSeq(move_mnl)
+				mode_mnl = 1 # Ensures one forward rotation per click
+				waveSine.audioInputSeq([(move_mnl, mode_mnl)])
 				window.refresh()
 				st_Curr = "MNL_GET"
 			
