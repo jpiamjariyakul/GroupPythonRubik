@@ -50,12 +50,51 @@ def windowDefine():
 								sg.Button("Confirm", key="_btn_confirmFile_")
 								],
 							]
-	frame_in_manual = [	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_")
-							],
-						[	sg.Button("UP", key="_btn_man_U_"), sg.Button("RIGHT", key="_btn_man_R_"), sg.Button("FRONT", key="_btn_man_F_"), 
-							sg.Button("DOWN", key="_btn_man_D_"), sg.Button("LEFT", key="_btn_man_L_"), sg.Button("BACK", key="_btn_man_B_")
+	frame_in_manual = 	[	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_")
+								],
+							[	sg.Column(	[	[sg.Text("")],
+												[sg.Text("Forward")],
+												[sg.Text("Double")],
+												[sg.Text("Reverse")]
+									]),
+								sg.Column(	[	[sg.Text("U")],
+												[sg.Button("FWD", key="_btn_man_U_fwd")],
+												[sg.Button("DBL", key="_btn_man_U_dbl")],
+												[sg.Button("REV", key="_btn_man_U_rev")]
+									]),
+								sg.Column(	[	[sg.Text("R")],
+												[sg.Button("FWD", key="_btn_man_R_fwd")],
+												[sg.Button("DBL", key="_btn_man_R_dbl")],
+												[sg.Button("REV", key="_btn_man_R_rev")]
+									]),
+								sg.Column(	[	[sg.Text("F")],
+												[sg.Button("FWD", key="_btn_man_F_fwd")],
+												[sg.Button("DBL", key="_btn_man_F_dbl")],
+												[sg.Button("REV", key="_btn_man_F_rev")]
+									]),
+								sg.Column(	[	[sg.Text("D")],
+												[sg.Button("FWD", key="_btn_man_D_fwd")],
+												[sg.Button("DBL", key="_btn_man_D_dbl")],
+												[sg.Button("REV", key="_btn_man_D_rev")]
+									]),
+								sg.Column(	[	[sg.Text("L")],
+												[sg.Button("FWD", key="_btn_man_L_fwd")],
+												[sg.Button("DBL", key="_btn_man_L_dbl")],
+												[sg.Button("REV", key="_btn_man_L_rev")]
+									]),
+								sg.Column(	[	[sg.Text("B")],
+												[sg.Button("FWD", key="_btn_man_B_fwd")],
+												[sg.Button("DBL", key="_btn_man_B_dbl")],
+												[sg.Button("REV", key="_btn_man_B_rev")]
+									]),
+								]
 							]
-						]
+	# frame_in_manual = [	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_")
+	# 						],
+	# 					[	sg.Button("UP", key="_btn_man_U_"), sg.Button("RIGHT", key="_btn_man_R_"), sg.Button("FRONT", key="_btn_man_F_"), 
+	# 						sg.Button("DOWN", key="_btn_man_D_"), sg.Button("LEFT", key="_btn_man_L_"), sg.Button("BACK", key="_btn_man_B_")
+	# 						]
+	# 					]
 	frame_cube =	[	[	sg.Graph((400, 400), (0, 180), (240, 0), pad=(20, 20), key="_net_", change_submits=True, drag_submits=False),
 							sg.Listbox(key="_listMoves_", values=[], size=(4, 8), disabled=True)
 							],
@@ -174,12 +213,24 @@ def main(): # Implements each stage of GUI progression with state machine
 				#window["_btn_confirmCam_"].update(disabled=True)
 
 				window["_radio_manual_"].update(disabled=False)
-				window["_btn_man_U_"].update(disabled=True)
-				window["_btn_man_R_"].update(disabled=True)
-				window["_btn_man_F_"].update(disabled=True)
-				window["_btn_man_D_"].update(disabled=True)
-				window["_btn_man_L_"].update(disabled=True)
-				window["_btn_man_B_"].update(disabled=True)
+				window["_btn_man_U_fwd"].update(disabled=True)
+				window["_btn_man_R_fwd"].update(disabled=True)
+				window["_btn_man_F_fwd"].update(disabled=True)
+				window["_btn_man_D_fwd"].update(disabled=True)
+				window["_btn_man_L_fwd"].update(disabled=True)
+				window["_btn_man_B_fwd"].update(disabled=True)
+				window["_btn_man_U_dbl"].update(disabled=True)
+				window["_btn_man_R_dbl"].update(disabled=True)
+				window["_btn_man_F_dbl"].update(disabled=True)
+				window["_btn_man_D_dbl"].update(disabled=True)
+				window["_btn_man_L_dbl"].update(disabled=True)
+				window["_btn_man_B_dbl"].update(disabled=True)
+				window["_btn_man_U_rev"].update(disabled=True)
+				window["_btn_man_R_rev"].update(disabled=True)
+				window["_btn_man_F_rev"].update(disabled=True)
+				window["_btn_man_D_rev"].update(disabled=True)
+				window["_btn_man_L_rev"].update(disabled=True)
+				window["_btn_man_B_rev"].update(disabled=True)
 				if values["_radio_cam_"]:
 					st_Curr = "CAM_IDLE"
 				if values["_radio_ascii_"]:
@@ -320,16 +371,18 @@ def main(): # Implements each stage of GUI progression with state machine
 				window["_slide_movesProgress_"].update(disabled=True)
 				window["_btn_solve_"].update(disabled=True)
 				drawCubelets(window, cube)
+				print(ls_runMoves)
 				for index in range(len(ls_runMoves)):
-					moveCurrent = ls_runMoves[index]
+					moveCurrent = ls_runMoves[index] # Obtains current move array of [face, mode]
 					window["_slide_movesProgress_"].update(value=(index + 1))
 					window["_txt_moveIndex_"].update(str(index + 1))
 					window["_txt_moveCurrent_"].update(str(str_runMoves[index]))
 					#print(index + 1)
-					for i in range(moveCurrent[1]):
-						cube = scramble.moveFace(moveCurrent[0], cube)
-						# TODO: Audio - output per file
-						waveSine.audioInputSeq(moveCurrent[0])
+					print(moveCurrent)
+					# Audio output of specific frequencies corresponding to face
+					waveSine.audioInputSeq([moveCurrent])
+					# Rotates & displays cube given mode
+					for i in range(moveCurrent[1]): cube = scramble.moveFace(moveCurrent[0], cube)
 					drawCubelets(window, cube)
 					window.refresh()
 				st_Curr = "DONE"
@@ -342,12 +395,24 @@ def main(): # Implements each stage of GUI progression with state machine
 			## ------------------------------------------------------------------------
 			# Given manual input mode selected
 			elif st_Curr == "MNL_IDLE":
-				window["_btn_man_U_"].update(disabled=False)
-				window["_btn_man_R_"].update(disabled=False)
-				window["_btn_man_F_"].update(disabled=False)
-				window["_btn_man_D_"].update(disabled=False)
-				window["_btn_man_L_"].update(disabled=False)
-				window["_btn_man_B_"].update(disabled=False)
+				window["_btn_man_U_fwd"].update(disabled=False)
+				window["_btn_man_R_fwd"].update(disabled=False)
+				window["_btn_man_F_fwd"].update(disabled=False)
+				window["_btn_man_D_fwd"].update(disabled=False)
+				window["_btn_man_L_fwd"].update(disabled=False)
+				window["_btn_man_B_fwd"].update(disabled=False)
+				window["_btn_man_U_dbl"].update(disabled=False)
+				window["_btn_man_R_dbl"].update(disabled=False)
+				window["_btn_man_F_dbl"].update(disabled=False)
+				window["_btn_man_D_dbl"].update(disabled=False)
+				window["_btn_man_L_dbl"].update(disabled=False)
+				window["_btn_man_B_dbl"].update(disabled=False)
+				window["_btn_man_U_rev"].update(disabled=False)
+				window["_btn_man_R_rev"].update(disabled=False)
+				window["_btn_man_F_rev"].update(disabled=False)
+				window["_btn_man_D_rev"].update(disabled=False)
+				window["_btn_man_L_rev"].update(disabled=False)
+				window["_btn_man_B_rev"].update(disabled=False)
 				cube = getNew.obtainVirCube() # Generates default virtual cube to display movement
 				drawCubelets(window, cube)
 				st_Curr = "MNL_GET"
@@ -355,22 +420,37 @@ def main(): # Implements each stage of GUI progression with state machine
 				st_Prev = st_Curr
 				if values["_radio_cam_"] or values["_radio_ascii_"]:
 					st_Curr = "INIT"
-				if 	event in ([	"_btn_man_U_", "_btn_man_R_", "_btn_man_F_",\
-								"_btn_man_D_", "_btn_man_L_", "_btn_man_B_"	]):
-					if event in ("_btn_man_U_"): move_mnl = "U"
-					elif event in ("_btn_man_R_"): move_mnl = "R"
-					elif event in ("_btn_man_F_"): move_mnl = "F"
-					elif event in ("_btn_man_D_"): move_mnl = "D"
-					elif event in ("_btn_man_L_"): move_mnl = "L"
-					elif event in ("_btn_man_B_"): move_mnl = "B"
+
+				ls_btn_U = ["_btn_man_U_fwd", "_btn_man_U_dbl", "_btn_man_U_rev"]
+				ls_btn_R = ["_btn_man_R_fwd", "_btn_man_R_dbl", "_btn_man_R_rev"]
+				ls_btn_F = ["_btn_man_F_fwd", "_btn_man_F_dbl", "_btn_man_F_rev"]
+				ls_btn_D = ["_btn_man_D_fwd", "_btn_man_D_dbl", "_btn_man_D_rev"]
+				ls_btn_L = ["_btn_man_L_fwd", "_btn_man_L_dbl", "_btn_man_L_rev"]
+				ls_btn_B = ["_btn_man_B_fwd", "_btn_man_B_dbl", "_btn_man_B_rev"]
+				ls_btn_fwd = ["_btn_man_U_fwd", "_btn_man_R_fwd", "_btn_man_F_fwd", "_btn_man_D_fwd", "_btn_man_L_fwd", "_btn_man_B_fwd"]
+				ls_btn_dbl = ["_btn_man_U_dbl", "_btn_man_R_dbl", "_btn_man_F_dbl", "_btn_man_D_dbl", "_btn_man_L_dbl", "_btn_man_B_dbl"]
+				ls_btn_rev = ["_btn_man_U_rev", "_btn_man_R_rev", "_btn_man_F_rev", "_btn_man_D_rev", "_btn_man_L_rev", "_btn_man_B_rev"]
+				
+				if (event in (ls_btn_fwd)) or (event in (ls_btn_dbl)) or (event in (ls_btn_rev)):
+					if event in (ls_btn_U): move_mnl = "U"
+					elif event in (ls_btn_R): move_mnl = "R"
+					elif event in (ls_btn_F): move_mnl = "F"
+					elif event in (ls_btn_D): move_mnl = "D"
+					elif event in (ls_btn_L): move_mnl = "L"
+					elif event in (ls_btn_B): move_mnl = "B"
+					
+					if event in (ls_btn_fwd): type_mnl = 1
+					elif event in (ls_btn_dbl): type_mnl = 2
+					elif event in (ls_btn_rev):	type_mnl = 3
 					print(event)
 					st_Curr = "MNL_SET"
 
 			elif st_Curr == "MNL_SET":
 				print("Rotating face " + move_mnl)
-				cube = scramble.moveFace(move_mnl, cube)
+				for i in range(type_mnl):
+					cube = scramble.moveFace(move_mnl, cube)
+					waveSine.audioInputSeq([(move_mnl, type_mnl)])
 				drawCubelets(window, cube)
-				waveSine.audioInputSeq(move_mnl)
 				window.refresh()
 				st_Curr = "MNL_GET"
 			
