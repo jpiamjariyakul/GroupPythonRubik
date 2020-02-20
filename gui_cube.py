@@ -164,24 +164,22 @@ def main(): # Implements each stage of GUI progression with state machine
 		if (st_Prev in ls_state) and (st_Curr in ls_state):
 			###	Given launch, waits for user input to method of obtaining moves
 			if st_Curr == "INIT": # State: Idle-waiting to initialise camera
-				if (st_Curr != st_Prev): # Should not enter here if working properly
-					window["_radio_ascii_"].update(disabled=False)
-					window["_file_ascii_"].update(disabled=True)
-					window["_btn_inputFile_"].update(disabled=True)
-					window["_btn_confirmFile_"].update(disabled=True)
+				window["_radio_ascii_"].update(disabled=False)
+				window["_file_ascii_"].update(disabled=True)
+				window["_btn_inputFile_"].update(disabled=True)
+				window["_btn_confirmFile_"].update(disabled=True)
 
-					window["_radio_cam_"].update(disabled=False)
-					window["_btn_inputCam_"].update(disabled=True)
-					#window["_btn_confirmCam_"].update(disabled=True)
+				window["_radio_cam_"].update(disabled=False)
+				window["_btn_inputCam_"].update(disabled=True)
+				#window["_btn_confirmCam_"].update(disabled=True)
 
-					window["_radio_manual_"].update(disabled=False)
-					window["_btn_man_U_"].update(disabled=True)
-					window["_btn_man_R_"].update(disabled=True)
-					window["_btn_man_F_"].update(disabled=True)
-					window["_btn_man_D_"].update(disabled=True)
-					window["_btn_man_L_"].update(disabled=True)
-					window["_btn_man_B_"].update(disabled=True)
-					st_Prev = st_Curr #  _radio_ascii_
+				window["_radio_manual_"].update(disabled=False)
+				window["_btn_man_U_"].update(disabled=True)
+				window["_btn_man_R_"].update(disabled=True)
+				window["_btn_man_F_"].update(disabled=True)
+				window["_btn_man_D_"].update(disabled=True)
+				window["_btn_man_L_"].update(disabled=True)
+				window["_btn_man_B_"].update(disabled=True)
 				if values["_radio_cam_"]:
 					st_Curr = "CAM_IDLE"
 				if values["_radio_ascii_"]:
@@ -222,18 +220,15 @@ def main(): # Implements each stage of GUI progression with state machine
 				window["frame_combined_1"].update(data=imgbytes_combined[1])
 				if event in ("_btn_inputCam_"):
 					st_Curr = "CAM_SET"
-				elif event in ("_btn_reset_"):
+				elif (event in ("_btn_reset_")) or values["_radio_ascii_"] or values["_radio_manual_"]:
 					getColor.cam_releaseCap(cap_0, cap_1)
 					window["frame_raw_0"].update(data=None)
 					window["frame_raw_1"].update(data=None)
 					window["frame_combined_0"].update(data=None)
 					window["frame_combined_1"].update(data=None)
-				if values["_radio_ascii_"] or values["_radio_manual_"]:
-					getColor.cam_releaseCap(cap_0, cap_1)
 					st_Curr = "INIT"
 			###	Given camera confirmation, obtains cubelets from such images
 			elif st_Curr == "CAM_SET":
-				st_Prev = st_Curr
 				window["_btn_inputCam_"].update(disabled=True)
 				getColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
 				cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
@@ -243,7 +238,6 @@ def main(): # Implements each stage of GUI progression with state machine
 				st_Curr = "MOVES_GET_CAM"
 			###	Given cube parsed from images, evaluates moves from camera
 			elif st_Curr == "MOVES_GET_CAM":
-				st_Prev = st_Curr
 				ls_kocSolve, str_kocSolve = cubeSolve.solveCubeKoc(cubeSolve.parseCubeString(cube))
 				ls_runMoves, str_runMoves = ls_kocSolve, str_kocSolve
 				print(ls_runMoves)
@@ -253,7 +247,6 @@ def main(): # Implements each stage of GUI progression with state machine
 			## ------------------------------------------------------------------------
 			## Refers to ASCII-related inputs
 			elif st_Curr == "ASC_IDLE":
-				st_Prev = st_Curr
 				window["frame_raw_0"].update(data=None)
 				window["frame_raw_1"].update(data=None)
 				window["frame_combined_0"].update(data=None)
@@ -270,7 +263,6 @@ def main(): # Implements each stage of GUI progression with state machine
 				if values["_radio_cam_"] or values["_radio_manual_"]:
 					st_Curr = "INIT"
 			elif st_Curr == "ASC_SET":
-				st_Prev = st_Curr
 				window["_btn_confirmFile_"].update(disabled=True)
 				window["_btn_inputFile_"].update(disabled=True)
 				window["_file_ascii_"].update(disabled=True)
@@ -278,7 +270,6 @@ def main(): # Implements each stage of GUI progression with state machine
 				str_Mixup = fileMixup.read()
 				st_Curr = "MOVES_GET_ASC"
 			elif st_Curr == "MOVES_GET_ASC":
-				st_Prev = st_Curr
 				str_ascii = getAscii.returnParsedStr(str_Mixup) # Test list of moves
 				ls_ascii = cubeSolve.getMovesList(str_ascii)
 				ls_runMoves, str_runMoves = ls_ascii, str_ascii
@@ -326,10 +317,9 @@ def main(): # Implements each stage of GUI progression with state machine
 
 			###	Given user confirmation to run moves, runs such moves
 			elif st_Curr == "MOVES_RUN":
-				if (st_Curr != st_Prev): # Should come from "MOVES_SET"
-					window["_slide_movesProgress_"].update(disabled=True)
-					window["_btn_solve_"].update(disabled=True)
-					drawCubelets(window, cube)
+				window["_slide_movesProgress_"].update(disabled=True)
+				window["_btn_solve_"].update(disabled=True)
+				drawCubelets(window, cube)
 				for index in range(len(ls_runMoves)):
 					moveCurrent = ls_runMoves[index]
 					window["_slide_movesProgress_"].update(value=(index + 1))
@@ -346,50 +336,37 @@ def main(): # Implements each stage of GUI progression with state machine
 
 			### Given move completion, affirm with message
 			elif st_Curr == "DONE":
-				if (st_Curr != st_Prev): # Should come from "MOVES_RUN"
-					print("DONE!")
-					st_Prev = st_Curr
+				print("DONE!")
 				st_Curr = "INIT"
 			
 			## ------------------------------------------------------------------------
 			# Given manual input mode selected
 			elif st_Curr == "MNL_IDLE":
-				if (st_Curr != st_Prev):
-					window["_btn_man_U_"].update(disabled=False)
-					window["_btn_man_R_"].update(disabled=False)
-					window["_btn_man_F_"].update(disabled=False)
-					window["_btn_man_D_"].update(disabled=False)
-					window["_btn_man_L_"].update(disabled=False)
-					window["_btn_man_B_"].update(disabled=False)
-					cube = getNew.obtainVirCube() # Generates virtual cube to display movement
-					drawCubelets(window, cube)
-					st_Prev = st_Curr
+				window["_btn_man_U_"].update(disabled=False)
+				window["_btn_man_R_"].update(disabled=False)
+				window["_btn_man_F_"].update(disabled=False)
+				window["_btn_man_D_"].update(disabled=False)
+				window["_btn_man_L_"].update(disabled=False)
+				window["_btn_man_B_"].update(disabled=False)
+				cube = getNew.obtainVirCube() # Generates default virtual cube to display movement
+				drawCubelets(window, cube)
 				st_Curr = "MNL_GET"
 			elif st_Curr == "MNL_GET":
 				st_Prev = st_Curr
 				if values["_radio_cam_"] or values["_radio_ascii_"]:
 					st_Curr = "INIT"
-				if event in ("_btn_man_U_"):
-					move_mnl = "U"
-					st_Curr = "MNL_SET"
-				elif event in ("_btn_man_R_"):
-					move_mnl = "R"
-					st_Curr = "MNL_SET"
-				elif event in ("_btn_man_F_"):
-					move_mnl = "F"
-					st_Curr = "MNL_SET"
-				elif event in ("_btn_man_D_"):
-					move_mnl = "D"
-					st_Curr = "MNL_SET"
-				elif event in ("_btn_man_L_"):
-					move_mnl = "L"
-					st_Curr = "MNL_SET"
-				elif event in ("_btn_man_B_"):
-					move_mnl = "B"
+				if 	event in ([	"_btn_man_U_", "_btn_man_R_", "_btn_man_F_",\
+								"_btn_man_D_", "_btn_man_L_", "_btn_man_B_"	]):
+					if event in ("_btn_man_U_"): move_mnl = "U"
+					elif event in ("_btn_man_R_"): move_mnl = "R"
+					elif event in ("_btn_man_F_"): move_mnl = "F"
+					elif event in ("_btn_man_D_"): move_mnl = "D"
+					elif event in ("_btn_man_L_"): move_mnl = "L"
+					elif event in ("_btn_man_B_"): move_mnl = "B"
+					print(event)
 					st_Curr = "MNL_SET"
 
 			elif st_Curr == "MNL_SET":
-				st_Prev = st_Curr
 				print("Rotating face " + move_mnl)
 				cube = scramble.moveFace(move_mnl, cube)
 				drawCubelets(window, cube)
