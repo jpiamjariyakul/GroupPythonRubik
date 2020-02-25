@@ -144,8 +144,7 @@ def main(): # Implements each stage of GUI progression with state machine
 		# event, values = window.read(timeout=v_timeout, timeout_key='timeout')
 
 		event, values = window.read(timeout=0, timeout_key='timeout')
-		if (st_Curr != st_Prev):
-			print("States: " + st_Curr + ", " + st_Prev)
+		if (st_Curr != st_Prev): print("States: " + st_Curr + ", " + st_Prev)
 
 		## Global events - applicable to all states (given user being able to input)
 		if event in (None, "_btn_terminate_"): # Given cancel clicked, exits program
@@ -190,9 +189,9 @@ def main(): # Implements each stage of GUI progression with state machine
 			## ------------------------------------------------------------------------
 			## Concerns camera-related inputs
 			if st_Curr == "CAM_IDLE":
+				st_Prev = st_Curr
 				if (st_Curr != st_Prev):
 					window["_btn_inputCam_"].update(disabled=False)
-					st_Prev = st_Curr
 				window["frame_raw_0"].update(data=None)
 				window["frame_raw_1"].update(data=None)
 				window["frame_combined_0"].update(data=None)
@@ -249,10 +248,12 @@ def main(): # Implements each stage of GUI progression with state machine
 			## ------------------------------------------------------------------------
 			### Refers to ASCII-related inputs
 			elif st_Curr == "ASC_IDLE":
+				st_Prev = st_Curr
 				window["frame_raw_0"].update(data=None)
 				window["frame_raw_1"].update(data=None)
 				window["frame_combined_0"].update(data=None)
 				window["frame_combined_1"].update(data=None)
+				#print("DEBUG: " + st_Curr + ", " + st_Prev)
 				st_Curr = "ASC_GET"
 			elif st_Curr == "ASC_GET":
 				if (st_Curr != st_Prev):
@@ -268,15 +269,23 @@ def main(): # Implements each stage of GUI progression with state machine
 				window["_btn_confirmFile_"].update(disabled=True)
 				window["_btn_inputFile_"].update(disabled=True)
 				window["_file_ascii_"].update(disabled=True)
-				fileMixup = open(str(values["_file_ascii_"]), 'r')
-				str_Mixup = fileMixup.read()
-				st_Curr = "MOVES_GET_ASC"
+				try:
+					fileMixup = open(str(values["_file_ascii_"]), 'r')
+					str_Mixup = fileMixup.read()
+					st_Curr = "MOVES_GET_ASC"
+				except:
+					print("Unable to read file!")
+					st_Curr = "X"
 			elif st_Curr == "MOVES_GET_ASC":
-				str_ascii = getAscii.returnParsedStr(str_Mixup) # Test list of moves
-				ls_ascii = cubeSolve.getMovesList(str_ascii)
-				ls_runMoves, str_runMoves = ls_ascii, str_ascii
-				cube = getNew.obtainVirCube()
-				st_Curr = "MOVES_SET"
+				try: 
+					str_ascii = getAscii.returnParsedStr(str_Mixup) # Test list of moves
+					ls_ascii = cubeSolve.getMovesList(str_ascii)
+					ls_runMoves, str_runMoves = ls_ascii, str_ascii
+					cube = getNew.obtainVirCube()
+					st_Curr = "MOVES_SET"
+				except:
+					print("Fuck")
+					st_Curr = "X"
 
 				
 			## ------------------------------------------------------------------------
@@ -383,11 +392,11 @@ def main(): # Implements each stage of GUI progression with state machine
 			
 			## ------------------------------------------------------------------------
 			else: # Given invalid state
-				print("Invalid state! - Exiting")
-				break
+				print("Invalid state!")
+				st_Curr = "INIT"
 		else: # Given invalid state
-			print("Invalid state! - Exiting")
-			break
+			print("Invalid state!")
+			st_Curr = "INIT"
 	window.close() # GUI loop exited - destroy window
 
 if __name__ == "__main__":

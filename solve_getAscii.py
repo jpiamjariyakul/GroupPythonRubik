@@ -4,14 +4,16 @@
 import random # Testing purposes
 
 def returnParsedStr(str_Mixup):
+    str_permitted = "URFDLB'2" # String of valid characters in file
     ls_Mixup = []
     for i in range(len(str_Mixup)):
-        if (i >= len(str_Mixup)) or ((str_Mixup[i] == "'") or (str_Mixup[i] == "2")): continue
-        #print("Index " + str(i) + ": " + str_Mixup[i])
-        if (i < (len(str_Mixup) - 1)) and ((str_Mixup[i + 1] == "'") or (str_Mixup[i + 1] == "2")):
-            ls_Mixup.append(str_Mixup[i] + str_Mixup[i + 1])
-        else:
-            ls_Mixup.append(str_Mixup[i])
+        if str_Mixup[i] in str_permitted:
+            if (i >= len(str_Mixup)) or ((str_Mixup[i] == "'") or (str_Mixup[i] == "2")): continue
+            #print("Index " + str(i) + ": " + str_Mixup[i])
+            if (i < (len(str_Mixup) - 1)) and ((str_Mixup[i + 1] == "'") or (str_Mixup[i + 1] == "2")):
+                ls_Mixup.append(str_Mixup[i] + str_Mixup[i + 1])
+            else:
+                ls_Mixup.append(str_Mixup[i])
     return ls_Mixup
 
 '''
@@ -19,7 +21,7 @@ def tb_parser(movesMax, iterations):
     def runBench(moves):
         def generateBench(moves):
             def outputFace():
-                return random.choice(["U", "R", "F", "D", "L", "B"])
+                return random.choice(["U", "R", "F", "D", "L", "B", "", "X"])
             def outputParam():
                 return random.choice(["'", "2", ""])
             ls_movesBench = []
@@ -27,8 +29,10 @@ def tb_parser(movesMax, iterations):
                 ls_movesBench.append(str(outputFace() + outputParam()))
             return ls_movesBench
         ls_movesBench = generateBench(moves)
+        print(ls_movesBench)
         str_movesBench = ''.join(ls_movesBench)
         ls_parsed = returnParsedStr(str_movesBench)
+        print(ls_parsed)
         if ls_parsed != ls_movesBench:
             return False
         else:
@@ -39,6 +43,6 @@ def tb_parser(movesMax, iterations):
     if False in itr_bench:
         print("Failure detected")
     return itr_bench
-'''
 
-#print(tb_parser(200000, 20))
+print(tb_parser(20, 2))
+'''

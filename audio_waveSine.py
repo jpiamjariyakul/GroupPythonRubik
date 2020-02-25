@@ -47,4 +47,4 @@ def audioInputSeq(ls_moves):# Receives list of moves
 		print("Playing audio for " + str(frqcCurrent) + " Hz")
 		for turn in range(frqcCurrent[1]): audioPlayMove(frqcCurrent[0]) # Plays audio corresponding to moves in list
 
-audioInputSeq([('F', 1)])
+#audioInputSeq([('F', 1)])
