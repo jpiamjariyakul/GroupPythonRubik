@@ -6,6 +6,7 @@ import random # Testing purposes
 def returnParsedStr(str_Mixup):
     str_permitted = "URFDLB'2" # String of valid characters in file
     ls_Mixup = []
+    isValid = True
     for i in range(len(str_Mixup)):
         if str_Mixup[i] in str_permitted:
             if (i >= len(str_Mixup)) or ((str_Mixup[i] == "'") or (str_Mixup[i] == "2")): continue
@@ -14,7 +15,10 @@ def returnParsedStr(str_Mixup):
                 ls_Mixup.append(str_Mixup[i] + str_Mixup[i + 1])
             else:
                 ls_Mixup.append(str_Mixup[i])
-    return ls_Mixup
+        else:
+            isValid = False
+            break
+    return ls_Mixup, isValid
 
 '''
 def tb_parser(movesMax, iterations):
