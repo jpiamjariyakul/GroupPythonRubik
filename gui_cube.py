@@ -1,26 +1,56 @@
-import time
+# System & installed modules
 from copy import deepcopy
-import random
-
 import PySimpleGUI as sg
-
-import cubeGen_scramble as scramble
-#import cubeGen_display as cubeDisplay
-import cubeGen_getNew as getNew
-
-import solve_cubeSolve as cubeSolve
-from variables import dict_faceColor
-
-import solve_getAscii as getAscii
-
-import imgParse_getColor as getColor
-import imgParse_initCam as initCam
-
-import audio_waveSine as waveSine
 import pygame
 
-CUBE_SIZE = 20
-FACE_SIZE = CUBE_SIZE * 3
+# Importing specific variables to be utilised in GUI
+from variables import dict_faceColor
+
+# Custom modules to obtain functions necessary
+import cubeGen_scramble as scramble
+import cubeGen_getNew as getNew
+import solve_cubeSolve as cubeSolve
+import solve_getAscii as getAscii
+import imgParse_getColor as getColor
+import imgParse_initCam as initCam
+import audio_waveSine as waveSine
+# NB: Not importing everything - only entry-point functions required to operate GUI
+
+# Draws outline of cube faces & (if specified) individual cubelets
+def drawCubelets(window, cube=[]):
+	CUBE_SIZE = 20
+	FACE_SIZE = CUBE_SIZE * 3
+	for face_row in range(3): # Draws empty faces - three rows in net representaiton
+		for face_col in range(4): # Four columns in net representation
+			if (face_col == 1) or (face_row == 1): # Draws outlines given cross-like structure
+				window["_net_"].draw_rectangle(	(	(face_col * FACE_SIZE), 
+													(face_row * FACE_SIZE)
+													),
+												(	((face_col * FACE_SIZE) + FACE_SIZE), 
+													((face_row * FACE_SIZE) + FACE_SIZE)
+													),
+												line_color="black", fill_color="white"
+												)
+	if (cube != []): # If cube parameter passed, draw colored cubelets as well
+		for face in range(6):
+			dict_coordFace = {	0: (1, 0), 1: (2, 1),
+								2: (1, 1), 3: (1, 2),
+								4: (0, 1), 5: (3, 1)	}
+			coordFace = dict_coordFace.get(face)
+			for cube_row in range(3):
+				for cube_col in range(3):
+					dict_colorAbbrev = {	'W': "white",	'R': "red",
+											'O': "orange",	'Y': "yellow",
+											'G': "green",	'B': "blue"		}
+					colorCube = dict_colorAbbrev.get(dict_faceColor.get(cube[face][cube_row][cube_col]))
+					window["_net_"].draw_rectangle(	(	(FACE_SIZE * coordFace[0]) + (cube_col * CUBE_SIZE), 
+														(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	
+														),
+													(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
+														(FACE_SIZE * coordFace[1]) + ((cube_row * CUBE_SIZE) + CUBE_SIZE)
+														),
+													fill_color=colorCube
+													)
 
 # For testing purposes - obtains new cube (scrambling optional)\
 def windowDefine():
@@ -33,11 +63,11 @@ def windowDefine():
 						# 	sg.Button("Run/Confirm", key="_btn_inputCam_")
 						# 	#sg.Button("Confirm", key="_btn_confirmCam_", disabled=True)
 						# 	],
-						[	sg.Column([	[	sg.Image(filename='', key="frame_raw_0", size=(200, 200)), 
-											sg.Image(filename='', key="frame_combined_0", size=(200, 200))
+						[	sg.Column([	[	sg.Image(filename='', key="frame_raw_0", background_color="black", pad=(5, 5)), 
+											sg.Image(filename='', key="frame_combined_0", background_color="black", pad=(5, 5))
 											],
-										[	sg.Image(filename='', key="frame_raw_1", size=(200, 200)),
-											sg.Image(filename='', key="frame_combined_1", size=(200, 200))
+										[	sg.Image(filename='', key="frame_raw_1", background_color="black", pad=(5, 5)),
+											sg.Image(filename='', key="frame_combined_1", background_color="black", pad=(5, 5))
 											]
 										])
 							]
@@ -53,12 +83,13 @@ def windowDefine():
 	frame_in_manual = [	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_")
 							],
 						[	sg.Button("UP", key="_btn_man_U_"), sg.Button("RIGHT", key="_btn_man_R_"), sg.Button("FRONT", key="_btn_man_F_"), 
-							sg.Button("DOWN", key="_btn_man_D_"), sg.Button("LEFT", key="_btn_man_L_"), sg.Button("BACK", key="_btn_man_B_")
-							],
-						[	sg.Radio("Forward", "Radio_Manual", True, key="_radio_in_mnl_fwd_"),
-							sg.Radio("Double", "Radio_Manual", key="_radio_in_mnl_dbl_"),
-							sg.Radio("Reverse", "Radio_Manual", key="_radio_in_mnl_rvs_")
+							sg.Button("DOWN", key="_btn_man_D_"), sg.Button("LEFT", key="_btn_man_L_"), sg.Button("BACK", key="_btn_man_B_"),
+							sg.DropDown(values=["Forward", "Double", "Reverse"], key="_ls_mnl_mode_", default_value="Forward", readonly=True)
 							]
+						# [	sg.Radio("Forward", "Radio_Manual", True, key="_radio_in_mnl_fwd_"),
+						# 	sg.Radio("Double", "Radio_Manual", key="_radio_in_mnl_dbl_"),
+						# 	sg.Radio("Reverse", "Radio_Manual", key="_radio_in_mnl_rvs_")
+						# 	]
 						]
 	frame_cube =	[	[	sg.Text("Index: "), sg.Text("?", key="_txt_moveIndex_", size=(3, 1)),
 							sg.Slider(key="_slide_movesProgress_", orientation="horizontal", disable_number_display=True, disabled=True, range=(0, 0), enable_events=True),
@@ -76,55 +107,14 @@ def windowDefine():
 	layout = 	[	[	sg.Column(	[	[sg.Frame("Camera Input Mode", frame_in_cam)],
 										[sg.Frame("ASCII Input Mode", frame_in_ascii)]
 									]),
-						sg.Column(	[	[sg.Frame("Manual Input Mode", frame_in_manual), sg.Frame("Control Unit", frame_btn_ctrl)],
-										[sg.Frame("Net Representation", frame_cube)]
+						sg.Column(	[	[sg.Frame("Manual Input Mode", frame_in_manual)],
+										[sg.Frame("Net Representation", frame_cube)],
+										[sg.Frame("Control Unit", frame_btn_ctrl)]
 									])
 						]
 					]
-	def graphDefine(window):
-		for face_row in range(3):
-			for face_col in range(4):
-				if (face_col == 1) or (face_row == 1):
-					window["_net_"].draw_rectangle(	(	(face_col * FACE_SIZE), 
-														(face_row * FACE_SIZE)
-														),
-													(	((face_col * FACE_SIZE) + FACE_SIZE), 
-														((face_row * FACE_SIZE) + FACE_SIZE)
-														),
-													line_color="black"
-													)
 	window = sg.Window("Window Title", layout, finalize=True, return_keyboard_events=True, use_default_focus=False)
-	graphDefine(window)
 	return window
-
-def drawCubelets(window, cube):
-	for face in range(6):
-		dict_coordFace = {	0: (1, 0),
-							1: (2, 1),
-							2: (1, 1),
-							3: (1, 2),
-							4: (0, 1),
-							5: (3, 1)	}
-		coordFace = dict_coordFace.get(face)
-		for cube_row in range(3):
-			for cube_col in range(3):
-				dict_colorAbbrev = {	'W': "white",
-										'R': "red",
-										'O': "orange",
-										'Y': "yellow",
-										'G': "green",
-										'B': "blue"
-										}
-				colorCube = dict_colorAbbrev.get(dict_faceColor.get(cube[face][cube_row][cube_col]))
-				window["_net_"].draw_rectangle(	(	(FACE_SIZE * coordFace[0]) + (cube_col * CUBE_SIZE), 
-													(FACE_SIZE * coordFace[1]) + (cube_row * CUBE_SIZE)	
-													),
-												(	(FACE_SIZE * coordFace[0]) + ((cube_col * CUBE_SIZE) + CUBE_SIZE), 
-													(FACE_SIZE * coordFace[1]) + ((cube_row * CUBE_SIZE) + CUBE_SIZE)
-													),
-												fill_color=colorCube
-												)
-
 
 def main(): # Implements each stage of GUI progression with state machine
 	# Defines state machine verification
@@ -173,6 +163,10 @@ def main(): # Implements each stage of GUI progression with state machine
 
 				window["_radio_cam_"].update(disabled=False)
 				window["_btn_inputCam_"].update(disabled=True)
+				window["frame_raw_0"].update(filename='', size=(200, 200))
+				window["frame_raw_1"].update(filename='', size=(200, 200))
+				window["frame_combined_0"].update(filename='', size=(200, 200))
+				window["frame_combined_1"].update(filename='', size=(200, 200))
 				#window["_btn_confirmCam_"].update(disabled=True)
 
 				window["_radio_manual_"].update(disabled=False)
@@ -182,15 +176,17 @@ def main(): # Implements each stage of GUI progression with state machine
 				window["_btn_man_D_"].update(disabled=True)
 				window["_btn_man_L_"].update(disabled=True)
 				window["_btn_man_B_"].update(disabled=True)
-				window["_radio_in_mnl_fwd_"].update(disabled=True)
-				window["_radio_in_mnl_dbl_"].update(disabled=True)
-				window["_radio_in_mnl_rvs_"].update(disabled=True)
-				if values["_radio_cam_"]:
-					st_Curr = "CAM_IDLE"
-				if values["_radio_ascii_"]:
-					st_Curr = "ASC_IDLE"
-				if values["_radio_manual_"]:
-					st_Curr = "MNL_IDLE"
+				window["_ls_mnl_mode_"].update(disabled=True)
+
+				window["_listMoves_"].update(disabled=True, values=None)
+				window["_slide_movesProgress_"].update(disabled=True, range=(0, 0), value=0)
+				window["_txt_moveCurrent_"].update("?")
+				window["_txt_moveIndex_"].update("?")
+				drawCubelets(window) # Draws empty faces on net grid
+
+				if values["_radio_cam_"]:		st_Curr = "CAM_IDLE"
+				if values["_radio_ascii_"]:		st_Curr = "ASC_IDLE"
+				if values["_radio_manual_"]:	st_Curr = "MNL_IDLE"
 			
 			## ------------------------------------------------------------------------
 			## Concerns camera-related inputs
@@ -227,12 +223,6 @@ def main(): # Implements each stage of GUI progression with state machine
 						st_Curr = "CAM_SET"
 					elif (event in ("_btn_reset_")) or values["_radio_ascii_"] or values["_radio_manual_"]:
 						getColor.cam_releaseCap(cap_0, cap_1)
-						window["frame_raw_0"].update(data=None)
-						window["frame_raw_1"].update(data=None)
-						window["frame_combined_0"].update(data=None)
-						window["frame_combined_1"].update(data=None)
-						window.close()
-						window = windowDefine()
 						st_Curr = "INIT"
 				except: # Given camera not connected or removed during run
 					sg.PopupError(	"Unable to open/read camera.", 
@@ -315,9 +305,9 @@ def main(): # Implements each stage of GUI progression with state machine
 					drawCubelets(window, cube)
 					window["_listMoves_"].update(disabled=False, values=str_runMoves)
 					window["_slide_movesProgress_"].update(disabled=False, range=(0, len(str_runMoves)), value=0)
-					window["_btn_solve_"].update(disabled=False)
 					window["_txt_moveCurrent_"].update("None")
 					window["_txt_moveIndex_"].update(0)
+					window["_btn_solve_"].update(disabled=False)
 					st_Prev = st_Curr
 				''' Given input into slider, simulates cube turning
 				'''
@@ -380,9 +370,7 @@ def main(): # Implements each stage of GUI progression with state machine
 				window["_btn_man_D_"].update(disabled=False)
 				window["_btn_man_L_"].update(disabled=False)
 				window["_btn_man_B_"].update(disabled=False)
-				window["_radio_in_mnl_fwd_"].update(disabled=False)
-				window["_radio_in_mnl_dbl_"].update(disabled=False)
-				window["_radio_in_mnl_rvs_"].update(disabled=False)
+				window["_ls_mnl_mode_"].update(disabled=False)
 				cube = getNew.obtainVirCube() # Generates default virtual cube to display movement
 				drawCubelets(window, cube)
 				st_Curr = "MNL_GET"
@@ -404,9 +392,8 @@ def main(): # Implements each stage of GUI progression with state machine
 
 			elif st_Curr == "MNL_SET":
 				print("Rotating face " + move_mnl)
-				if values["_radio_in_mnl_fwd_"]: mode_mnl = 1 # Ensures one forward rotation per click
-				elif values["_radio_in_mnl_dbl_"]: mode_mnl = 2
-				elif values["_radio_in_mnl_rvs_"]: mode_mnl = 3
+				dict_ls_mnl = {	"Forward": 1, "Double": 2, "Reverse": 3	}
+				mode_mnl = dict_ls_mnl[values["_ls_mnl_mode_"]]
 				for i in range(mode_mnl):
 					cube = scramble.moveFace(move_mnl, cube)
 				waveSine.audioInputSeq([(move_mnl, mode_mnl)])

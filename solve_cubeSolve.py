@@ -2,6 +2,8 @@ import kociemba
 #import cube_gen.obtain_new as obtain_new
 #import displayCube
 
+from variables import dict_colorFace
+
 # Parses cube list (including debug-generated) into single string
 # In order of Kociemba faces
 def parseCubeString(cube):
@@ -28,3 +30,15 @@ def solveCubeKoc(str_cube):
 	str_kocSolve = kociemba.solve(str_cube).split(" ") # Removes white-spaces & places all Koc-output moves into list
 	ls_kocSolve = getMovesList(str_kocSolve)
 	return ls_kocSolve, str_kocSolve
+
+# Converts color notation to face notation
+# Utilises list from file "variables.py"
+def convertColorToFace(cube_color):
+    cube_face = []
+    for face in range(6):
+        cube_face.append([])
+        for row in range(3):
+            cube_face[face].append([])
+            for column in range(3):
+                cube_face[face][row].append(dict_colorFace.get(cube_color[face][row][column]))
+    return cube_face

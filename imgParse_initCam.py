@@ -38,5 +38,3 @@ def initCamera():
 	cubelets = cam_obtainCubelets(result_combined, result_color)
 	cubeDisplay.printCube(cubelets)
 	return cubelets
-
-#initCamera()
