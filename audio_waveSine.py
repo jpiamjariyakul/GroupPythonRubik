@@ -22,7 +22,7 @@ def playAudio(frqc, ms):
 	# Converts array into sound (via make_sound())
 	#print(len(sine_wave(frqc)))
 	sound = pygame.sndarray.make_sound(sine_wave(frqc))
-	print("Frqc: " + str(frqc))
+	#print("Frqc: " + str(frqc))
 	sound.play(-1) # Plays the sound
 	pygame.time.delay(ms) # Pause for a given number of milliseconds
 	sound.stop() # Stops the sound
@@ -30,21 +30,16 @@ def playAudio(frqc, ms):
 def audioPlayMove(frqcCurrent):
 	duration = int(50) # Duration of audio in ms
 	pygame.mixer.init(channels=1) # Sets audio to output in channel 1
-	playAudio((9 * 1000), duration) # 2 added ad hoc since output frqc is half intended
+	playAudio(frqcCurrent, duration) # 2 added ad hoc since output frqc is half intended
 
 def audioInputSeq(ls_moves):# Receives list of moves
 	dict_frqcFilter = { # All of these values are in kHz
-		# 'U': 1.55303,	'R': 2.28267,
-		# 'F': 0.5034,	'D': 0.05034,
-		# 'L': 0.15247,	'B': 1.0707
 		'U': 00.5,	'R': 03.5,
 		'F': 08.5,	'D': 12.5,
 		'L': 16.5,	'B': 20.5	}
-	#print(ls_moves)
 	ls_frqc = [(float(dict_frqcFilter.get(moveCurrent[0]) * 1000), moveCurrent[1]) for moveCurrent in ls_moves] # Maps moves in list to frequency (in kHz)
-	print(ls_frqc)
 	for frqcCurrent in ls_frqc:
-		print("Playing audio for " + str(frqcCurrent) + " Hz")
+		print("Playing audio for " + str(frqcCurrent[0]) + " Hz, given mode " + str(frqcCurrent[1]))
 		for turn in range(frqcCurrent[1]): audioPlayMove(frqcCurrent[0]) # Plays audio corresponding to moves in list
 
 #audioInputSeq([('F', 1)])

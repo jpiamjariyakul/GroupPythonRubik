@@ -1,7 +1,4 @@
 import kociemba
-#import cube_gen.obtain_new as obtain_new
-#import displayCube
-
 from variables import dict_colorFace
 
 # Parses cube list (including debug-generated) into single string
@@ -13,6 +10,7 @@ def parseCubeString(cube):
 			str_cube = str_cube + "".join(cube[face][row])
 	return str_cube
 
+# Parses solver string into a list of output moves
 def getMovesList(str_solve):
 	ls_solve = []
 	for moveSolve in str_solve:
