@@ -97,6 +97,7 @@ def windowDefine():
 						]
 	frame_btn_ctrl = 	[	[	sg.Button("Solve/Mix", disabled=True, key="_btn_solve_"),
 								sg.Button("Reset", key="_btn_reset_"), sg.Button("Terminate", key="_btn_terminate_")
+								#sg.Button("Settings", key="_btn_settings_")
 								]
 							]
 	# Given defined frames, define layout of window - separated into two columns
@@ -112,7 +113,7 @@ def windowDefine():
 	window = sg.Window("Window Title", layout, finalize=True, return_keyboard_events=True, use_default_focus=False)
 	return window
 
-def main(): # Implements each stage of GUI progression with state machine
+if __name__ == "__main__": # Implements each stage of GUI progression with state machine
 	# Defines state machine verification
 	ls_state = [	"INIT", 
 					"CAM_IDLE", "CAM_GET", "CAM_SET",
@@ -139,6 +140,8 @@ def main(): # Implements each stage of GUI progression with state machine
 			if ("cap_0" in locals()) or  ("cap_1" in locals()): getColor.cam_releaseCap(cap_0, cap_1)
 			window.close()
 			window = windowDefine()
+		if event in ("_btn_settings_"):
+			sg.Popup("Settings placeholder")
 
 		## Program only runs if states are in list of valid states
 		if (st_Prev in ls_state) and (st_Curr in ls_state):
@@ -391,5 +394,5 @@ def main(): # Implements each stage of GUI progression with state machine
 			st_Curr = "INIT"
 	window.close() # GUI loop exited - destroy window
 
-if __name__ == "__main__":
-	main()
+# if __name__ == "__main__":
+# 	main()
