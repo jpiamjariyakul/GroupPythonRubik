@@ -96,8 +96,8 @@ def windowDefine():
 							]
 						]
 	frame_btn_ctrl = 	[	[	sg.Button("Solve/Mix", disabled=True, key="_btn_solve_"),
-								sg.Button("Reset", key="_btn_reset_"), sg.Button("Terminate", key="_btn_terminate_")
-								#sg.Button("Settings", key="_btn_settings_")
+								sg.Button("Reset", key="_btn_reset_"), sg.Button("Terminate", key="_btn_terminate_"),
+								sg.Button("Settings", key="_btn_settings_")
 								]
 							]
 	# Given defined frames, define layout of window - separated into two columns
@@ -112,6 +112,23 @@ def windowDefine():
 					]
 	window = sg.Window("Window Title", layout, finalize=True, return_keyboard_events=True, use_default_focus=False)
 	return window
+
+def settingsDefine():
+	sg.theme("Reddit")
+	ls_color = ["Black", "Red", "White", "Green", "Orange", "Yellow"]
+	frame = [	[	sg.Text("Up"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Black", readonly=True)
+					],
+				[	sg.Text("Right"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Red", readonly=True)
+					],
+				[	sg.Text("Front"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="White", readonly=True)
+					],
+				[	sg.Text("Down"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Green", readonly=True)
+					],
+				[	sg.Text("Left"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Orange", readonly=True)
+					],
+				[	sg.Text("Back"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Yellow", readonly=True)
+					]
+				]
 
 if __name__ == "__main__": # Implements each stage of GUI progression with state machine
 	# Defines state machine verification
