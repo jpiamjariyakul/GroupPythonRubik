@@ -140,8 +140,8 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 			if ("cap_0" in locals()) or  ("cap_1" in locals()): getColor.cam_releaseCap(cap_0, cap_1)
 			window.close()
 			window = windowDefine()
-		if event in ("_btn_settings_"):
-			sg.Popup("Settings placeholder")
+		# if event in ("_btn_settings_"):
+		# 	sg.Popup("Settings placeholder")
 
 		## Program only runs if states are in list of valid states
 		if (st_Prev in ls_state) and (st_Curr in ls_state):
