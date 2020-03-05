@@ -116,19 +116,28 @@ def windowDefine():
 def settingsDefine():
 	sg.theme("Reddit")
 	ls_color = ["Black", "Red", "White", "Green", "Orange", "Yellow"]
-	frame = [	[	sg.Text("Up"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Black", readonly=True)
+	frame = [	[	sg.Text("Up"),	sg.DropDown(values=ls_color, key="_ls_set_U_", default_value="Black", readonly=True)
 					],
-				[	sg.Text("Right"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Red", readonly=True)
+				[	sg.Text("Right"),	sg.DropDown(values=ls_color, key="_ls_set_R_", default_value="Red", readonly=True)
 					],
-				[	sg.Text("Front"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="White", readonly=True)
+				[	sg.Text("Front"),	sg.DropDown(values=ls_color, key="_ls_set_F_", default_value="White", readonly=True)
 					],
-				[	sg.Text("Down"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Green", readonly=True)
+				[	sg.Text("Down"),	sg.DropDown(values=ls_color, key="_ls_set_D_", default_value="Green", readonly=True)
 					],
-				[	sg.Text("Left"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Orange", readonly=True)
+				[	sg.Text("Left"),	sg.DropDown(values=ls_color, key="_ls_set_L_", default_value="Orange", readonly=True)
 					],
-				[	sg.Text("Back"),	sg.DropDown(values=ls_color, key="_ls_set_color_", default_value="Yellow", readonly=True)
-					]
+				[	sg.Text("Back"),	sg.DropDown(values=ls_color, key="_ls_set_B_", default_value="Yellow", readonly=True)
+					],
+				[sg.Button("Test", key="_btn_test_")]
 				]
+	wd_set = sg.Window("Window Title", frame, finalize=True, return_keyboard_events=True, use_default_focus=False)
+	while True: 
+		event, values = wd_set.read(timeout=0, timeout_key='timeout')
+		if event in ("_btn_test_"):
+			print("Hello there!")
+			break
+	wd_set.close()
+	print("General Kenobi!")
 
 if __name__ == "__main__": # Implements each stage of GUI progression with state machine
 	# Defines state machine verification
@@ -158,7 +167,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 			window.close()
 			window = windowDefine()
 		if event in ("_btn_settings_"):
-			sg.Popup("Settings placeholder")
+			settingsDefine()
 
 		## Program only runs if states are in list of valid states
 		if (st_Prev in ls_state) and (st_Curr in ls_state):
