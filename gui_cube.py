@@ -52,6 +52,17 @@ def drawCubelets(window, cube=[]):
 													fill_color=colorCube
 													)
 
+def helpBoxDefine(st_Curr):
+	dict_helpBox = {
+		"CAM_IDLE":		"Press 'Run/Confirm' button to run cameras." + "\n" + "Ensure that two cameras are connected to computer." + "\n" + "Alternatively, select other radio buttons to activate other modes of operation.",
+		"CAM_GET":		"Align cube to solve to be in-line with output of image onscreen." + "\n" + "Press 'Run/Confirm' to validate & run the solver." + "\n" + "Alternatively, select other radio buttons to activate other modes of operation.",
+		"ASC_GET":		"Click 'Browse' to search for file containing moves to run solver/mixer with." + "\n" + "Click 'Confirm' to validate & run the mixer." + "\n" + "Alternatively, select other radio buttons to activate other modes of operation.",
+		"MOVES_SET":	"In the 'Net Representation' frame, you can see a representation of the cube in 2D view." + "\n" +  "Use the scrollbar ",
+		"MNL_GET":		""
+	}
+	tx_helpBox = dict_helpBox[st_Curr]
+	sg.Popup(	tx_helpBox,	title="Help"	)
+
 # Defines layout of GUI to be displayed - some initial values are assigned here
 def windowDefine():
 	sg.theme("Reddit") # Reddit theme applied (no orange, though - sad)
@@ -96,7 +107,8 @@ def windowDefine():
 							]
 						]
 	frame_btn_ctrl = 	[	[	sg.Button("Solve/Mix", disabled=True, key="_btn_solve_"),
-								sg.Button("Reset", key="_btn_reset_"), sg.Button("Terminate", key="_btn_terminate_")
+								sg.Button("Reset", key="_btn_reset_"), sg.Button("Terminate", key="_btn_terminate_"),
+								sg.Button("Help", key="_btn_helpBox_")
 								#sg.Button("Settings", key="_btn_settings_")
 								]
 							]
@@ -135,6 +147,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 		## Global events - applicable to all states (given user being able to input)
 		if event in (None, "_btn_terminate_"): # Given cancel clicked, exits program
 			break
+		if event in ("_btn_helpBox_"): helpBoxDefine(st_Curr)
 		if event in ("_btn_reset_"): # Given reset clicked, goes back to initial state
 			st_Curr = "INIT"
 			if ("cap_0" in locals()) or  ("cap_1" in locals()): getColor.cam_releaseCap(cap_0, cap_1)

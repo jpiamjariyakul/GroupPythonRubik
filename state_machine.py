@@ -1,0 +1,1 @@
+def stateMachine(st_curr, st_prev, window)

@@ -79,7 +79,7 @@ def readFrame(cap, camera):
 
 def cam_initCap():
 	cap_0 = cv2.VideoCapture(0, cv2.CAP_DSHOW) # Camera 1
-	cap_1 = cv2.VideoCapture(1, cv2.CAP_DSHOW) # Camera 2
+	cap_1 = cv2.VideoCapture(2, cv2.CAP_DSHOW) # Camera 2
 	return cap_0, cap_1
 
 def cam_obtain(cap_0, cap_1):
