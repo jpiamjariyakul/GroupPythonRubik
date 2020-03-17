@@ -13,7 +13,7 @@ Working code is in directory "PhotoRecognition"
 ### Python Modules
 - Python3 or higher
 - OpenCV-Python
-- Numpy
+- Numpy & Scipy
 - PySimpleGUI
 - PyGame
 
