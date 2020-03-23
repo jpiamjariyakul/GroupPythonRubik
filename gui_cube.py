@@ -52,21 +52,128 @@ def drawCubelets(window, cube=[]):
 													fill_color=colorCube
 													)
 
+
 # Defines layout of GUI to be displayed - some initial values are assigned here
 def windowDefine():
+	# Defines layout of HSV slider dialog boxes
+	def tabHSV():
+		# layout = [	[	sg.TabGroup([	[	sg.Tab('Tab 1', tab1_layout),
+		# 										sg.Tab('Tab 2', tab2_layout)
+		# 										]
+		# 									])
+		# 						],
+        #      			[	sg.Button('Read')]
+		# 			]
+		#[sg.Frame("Camera Input Mode", frame_in_cam)]
+		frame_hsv_w = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_w_lo_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_w_lo_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_w_lo_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							],
+						[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_w_up_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_w_up_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_w_up_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							]
+						]
+		frame_hsv_r0 = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_r0_lo_h_", orientation="horizontal", range=(0, 179))	],
+													[	sg.Text("S"), sg.Slider(key="_hsv_r0_lo_s_", orientation="horizontal", range=(0, 255))	],
+													[	sg.Text("V"), sg.Slider(key="_hsv_r0_lo_v_", orientation="horizontal", range=(0, 255))	]
+													])
+								],
+							[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_r0_up_h_", orientation="horizontal", range=(0, 179))	],
+													[	sg.Text("S"), sg.Slider(key="_hsv_r0_up_s_", orientation="horizontal", range=(0, 255))	],
+													[	sg.Text("V"), sg.Slider(key="_hsv_r0_up_v_", orientation="horizontal", range=(0, 255))	]
+													])
+								]
+						]
+		frame_hsv_r1 = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_r1_lo_h_", orientation="horizontal", range=(0, 179))	],
+													[	sg.Text("S"), sg.Slider(key="_hsv_r1_lo_s_", orientation="horizontal", range=(0, 255))	],
+													[	sg.Text("V"), sg.Slider(key="_hsv_r1_lo_v_", orientation="horizontal", range=(0, 255))	]
+													])
+								],
+							[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_r1_up_h_", orientation="horizontal", range=(0, 179))	],
+													[	sg.Text("S"), sg.Slider(key="_hsv_r1_up_s_", orientation="horizontal", range=(0, 255))	],
+													[	sg.Text("V"), sg.Slider(key="_hsv_r1_up_v_", orientation="horizontal", range=(0, 255))	]
+													])
+								]
+						]
+		frame_hsv_o = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_o_lo_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_o_lo_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_o_lo_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							],
+						[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_o_up_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_o_up_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_o_up_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							]
+						]
+		frame_hsv_y = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_y_lo_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_y_lo_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_y_lo_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							],
+						[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_y_up_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_y_up_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_y_up_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							]
+						]
+		frame_hsv_g = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_g_lo_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_g_lo_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_g_lo_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							],
+						[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_g_up_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_g_up_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_g_up_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							]
+						]
+		frame_hsv_b = [	[	sg.Frame("Lower", [	[	sg.Text("H"), sg.Slider(key="_hsv_b_lo_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_b_lo_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_b_lo_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							],
+						[	sg.Frame("Upper", [	[	sg.Text("H"), sg.Slider(key="_hsv_b_up_h_", orientation="horizontal", range=(0, 179))	],
+												[	sg.Text("S"), sg.Slider(key="_hsv_b_up_s_", orientation="horizontal", range=(0, 255))	],
+												[	sg.Text("V"), sg.Slider(key="_hsv_b_up_v_", orientation="horizontal", range=(0, 255))	]
+												])
+							]
+						]
+		layout_hsv = [	[	sg.TabGroup([	[	sg.Tab("White", frame_hsv_w),
+												sg.Tab("Red Lower", frame_hsv_r0),
+												sg.Tab("Red Upper", frame_hsv_r1),
+												sg.Tab("Orange", frame_hsv_o),
+												sg.Tab("Yellow", frame_hsv_y),
+												sg.Tab("Green", frame_hsv_g),
+												sg.Tab("Blue", frame_hsv_b)
+												]
+											], tab_location="topleft")
+							]
+						]
+		return layout_hsv
 	sg.theme("Reddit") # Reddit theme applied (no orange, though - sad)
 	# Define frames & its individual internal components
-	frame_in_cam = [	[	sg.Radio("Camera Input", "Radio_Input", True, key="_radio_cam_"),
-							sg.Button("Run/Confirm", key="_btn_inputCam_")
-							],
-						# Image components to display OpenCV outputs (including raw & processed frames)
-						[	sg.Column([	[	sg.Image(filename='', key="frame_raw_0", background_color="black", pad=(5, 5)), 
-											sg.Image(filename='', key="frame_combined_0", background_color="black", pad=(5, 5))
-											],
-										[	sg.Image(filename='', key="frame_raw_1", background_color="black", pad=(5, 5)),
-											sg.Image(filename='', key="frame_combined_1", background_color="black", pad=(5, 5))
-											]
-										])
+	layout_cam = [	[	sg.Radio("Camera Input", "Radio_Input", True, key="_radio_cam_"),
+						sg.Button("Run/Confirm", key="_btn_inputCam_")
+						],
+					# Image components to display OpenCV outputs (including raw & processed frames)
+					[	sg.Column([	[	sg.Image(filename='', key="frame_raw_0", background_color="black", pad=(5, 5)), 
+										sg.Image(filename='', key="frame_combined_0", background_color="black", pad=(5, 5))
+										],
+									[	sg.Image(filename='', key="frame_raw_1", background_color="black", pad=(5, 5)),
+										sg.Image(filename='', key="frame_combined_1", background_color="black", pad=(5, 5))
+										]
+									])
+						]
+					]
+	layout_hsv = tabHSV()
+	frame_in_cam = [	[	sg.TabGroup([	[	sg.Tab("Camera Layout", layout_cam),
+												sg.Tab("HSV Range", layout_hsv)
+												]
+											], tab_location="bottom")
 							]
 						]
 	frame_in_ascii =	[	[	sg.Radio("ASCII File Input", "Radio_Input", key="_radio_ascii_")
@@ -103,11 +210,11 @@ def windowDefine():
 	# Given defined frames, define layout of window - separated into two columns
 	layout = 	[	[	sg.Column(	[	[sg.Frame("Camera Input Mode", frame_in_cam)],
 										[sg.Frame("ASCII Input Mode", frame_in_ascii)]
-									]),
+										]),
 						sg.Column(	[	[sg.Frame("Manual Input Mode", frame_in_manual)],
 										[sg.Frame("Net Representation", frame_cube)],
 										[sg.Frame("Control Unit", frame_btn_ctrl)]
-									])
+										])
 						]
 					]
 	window = sg.Window("Window Title", layout, finalize=True, return_keyboard_events=True, use_default_focus=False)
@@ -126,6 +233,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 	st_Prev, st_Curr = "DONE", "INIT" # Defines startup states
 
 	window = windowDefine() # Sets window to defined layout
+	#boxHsv = hsvDialog()
 	while True: 
 		# Reads events & values in window, provided certain small update & delay
 		event, values = window.read(timeout=0, timeout_key='timeout')
@@ -196,6 +304,8 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 			elif st_Curr == "CAM_GET": # State: Runs cameras & obtains pictures
 				try:
 					if (st_Curr != st_Prev): # Should come from "INIT"
+						#boxHsv.UnHide()
+						#print(boxHsv)
 						window["_btn_inputCam_"].update(disabled=False)
 						#window["_btn_confirmCam_"].update(disabled=False)
 						#window["_textRunCam_"].update("Press [CONFIRM] to confirm camera input")
@@ -211,6 +321,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 					window["frame_combined_0"].update(data=imgbytes_combined[0])
 					window["frame_combined_1"].update(data=imgbytes_combined[1])
 					if event in ("_btn_inputCam_"):
+						#boxHsv.Hide()
 						st_Curr = "CAM_SET"
 					elif values["_radio_ascii_"] or values["_radio_manual_"]:
 						getColor.cam_releaseCap(cap_0, cap_1)

@@ -20,7 +20,7 @@ def colorFrames(frame):
 						(np.array([16, 132, 194]), 	np.array([100, 160, 255])),	# Bound of yellow
 						(np.array([45, 53, 88]), 	np.array([91, 255, 255])),	# Bound of green
 						(np.array([101, 128, 128]), np.array([150, 255, 255])))	# Bound of blue
-	hsv_redHigh = (np.array([170, 50, 50]),	np.array([180, 255, 255]))	# Bound of red_high
+	hsv_redHigh = (np.array([170, 50, 50]),	np.array([180, 255, 255]))	# Bound of red_high - special case!
 
 	# Sets threshold to the HSV image - iterates over all six colors
 	mask_color = []
