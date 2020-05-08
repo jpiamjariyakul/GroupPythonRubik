@@ -57,3 +57,5 @@ def printCube(cube):
 	print(gap + str(cube[3][0]))
 	print(gap + str(cube[3][1]))
 	print(gap + str(cube[3][2]))
+
+printCube(obtainVirCube(4))
