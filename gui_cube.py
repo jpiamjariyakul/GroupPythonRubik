@@ -227,7 +227,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 				cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
 				getNew.printCube(cubelets)
 				# Convert colour notation to face notation
-				cube = getNew.convertColorToFace(cubelets) # getNew.obtainVirCube(50) # Debug purposes - generates new cube
+				cube = cubeSolve.convertColorToFace(cubelets) # getNew.obtainVirCube(50) # Debug purposes - generates new cube
 				# Replace above line w/ verification of camera-obtained cubelet
 				st_Curr = "MOVES_GET_CAM"
 			###	Given cube parsed from images, evaluates moves from camera
