@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.signal
 import pygame, pygame.sndarray
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 # Reference:  	http://shallowsky.com/blog/programming/python-play-chords.html
 #				https://docs.scipy.org/doc/numpy/reference/generated/numpy.sin.html
@@ -11,22 +11,49 @@ import pygame, pygame.sndarray
 
 # Generation of sine wave code based from such references per stated above
 
-def playAudio(frqc, ms):
+def playAudio(frqc, duration):
 	# Code obtained
-	def sine_wave(hz, amplitude=4096, sample_rate=44100):
+
+	# def waveSine(hz, amplitude=4096, sample_rate=44100):
+	# 	# Compute N samples of a sine wave with given frequency and peak amplitude
+	# 	# Number of samples per second == sample rate == 44.1k Hz
+	# 	length = sample_rate / float(hz) # Sets sample length given sample rate
+	# 	w = (np.pi * 2) / length # Obtain 
+	# 	t = np.arange(int(length))
+	# 	onecycle = amplitude * np.sin(w * t)
+	# 	waveFull = np.resize(onecycle, sample_rate).astype(np.int16)
+	# 	plt.plot(np.arange(len(waveFull)), waveFull)
+	# 	plt.show()
+	# 	return waveFull
+
+	def waveSine(frqc, amplitude=4096, f_s=44100):
 		# Compute N samples of a sine wave with given frequency and peak amplitude
 		# Number of samples per second == sample rate == 44.1k Hz
-		length = sample_rate / float(hz) # Sets sample length given sample rate
-		w = (np.pi * 2) / length # Obtain 
-		t = np.arange(int(length)) * w
-		onecycle = amplitude * np.sin(t)
-		waveFull = np.resize(onecycle, sample_rate).astype(np.int16)
-		return waveFull
+		F = float(frqc) / f_s  # Obtain normalised frequency
+		N_cycle = 1/F # Samples per cycle
+		n = np.arange(0, int(N_cycle), 1) # Sets array of sampling indices
+		t = n / f_s # Obtain timestamps to sample signal
+		w = (2 * np.pi) * float(frqc) # Obtain angular frequency
+		x_one = np.sin(w * t) # Samples signal at given timestamps
+		x_full = np.resize((amplitude * x_one), f_s).astype(np.int16)
+		plt.plot(n, x_one)
+		plt.show()
+
+		'''
+		T = np.arange(0, (sample_rate * duration), 1)
+		# How many samples to take per second
+		w = (2 * np.pi) * float(hz)
+		x_one = np.sin(w * N / sample_rate)
+		x_full = (amplitude * x_one).astype(np.int16)
+		'''
+		return x_full
+
+
 	# Converts array into sound (via make_sound())
-	sound = pygame.sndarray.make_sound(sine_wave(frqc))
-	sound.play(-1) # Plays the sound
-	pygame.time.delay(ms) # Delays output for a given number of milliseconds
-	sound.stop() # Stops the sound
+	audio = pygame.sndarray.make_sound(waveSine(frqc))
+	audio.play(-1) # Plays the sound
+	pygame.time.delay(duration) # Delays output for a given number of milliseconds
+	audio.stop() # Stops the sound
 
 def audioPlayMove(frqcCurrent):
 	# duration = int(50) # Duration of audio in ms
