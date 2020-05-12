@@ -15,6 +15,7 @@ def playAudio(frqc, duration):
 	def waveSine(frqc, amplitude=4096, f_s=44100):
 		# Compute N samples of a sine wave with given frequency and peak amplitude
 		# Number of samples per second == sample rate == 44.1k Hz
+
 		F = float(frqc) / f_s  # Obtain normalised frequency
 		N_cycle = 1/F # Samples per cycle
 		n = np.arange(0, int(N_cycle), 1) # Sets array of sampling indices
@@ -22,6 +23,7 @@ def playAudio(frqc, duration):
 		w = (2 * np.pi) * float(frqc) # Obtain angular frequency
 		x_one = np.sin(w * t) # Samples signal at given timestamps
 		x_full = np.resize((amplitude * x_one), f_s).astype(np.int16)
+
 		'''
 		T = np.arange(0, (sample_rate * duration), 1)
 		# How many samples to take per second
@@ -44,9 +46,9 @@ def audioPlayMove(frqcCurrent):
 
 def audioInputSeq(ls_moves):# Receives list of moves
 	dict_frqcFilter = { # All of these values are in kHz
-		'U': 00.5,	'R': 03.5,
-		'F': 08.5,	'D': 12.5,
-		'L': 15.0 ,	'B': 20.5	} # L: 16.5 originally
+		'U': 0.42,	'R': 01.2,
+		'F': 02.4,	'D': 4.9,
+		'L': 10.2 ,	'B': 19.0	} # L: 16.5 originally
 	ls_frqc = [(float(dict_frqcFilter.get(moveCurrent[0]) * 1000), moveCurrent[1]) for moveCurrent in ls_moves] # Maps moves in list to frequency (in kHz)
 	for frqcCurrent in ls_frqc:
 		print("Playing audio for " + str(frqcCurrent[0]) + " Hz, given mode " + str(frqcCurrent[1]))

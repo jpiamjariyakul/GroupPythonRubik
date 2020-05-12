@@ -2,6 +2,7 @@
 from copy import deepcopy
 import PySimpleGUI as sg
 import pygame
+import keyboard
 
 # Importing specific variables to be utilised in GUI
 from variables import dict_faceColor
@@ -77,7 +78,8 @@ def windowDefine():
 								sg.Button("Confirm", key="_btn_confirmFile_")
 								],
 							]
-	frame_in_manual = [	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_")
+	frame_in_manual = [	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_"),
+							sg.Text("Or use URFDLB keysrfedgfhjgkjun")
 							],
 						# Buttons to control face to rotate & drop-down list to select direction/mode
 						[	sg.Button("UP", key="_btn_man_U_"), sg.Button("RIGHT", key="_btn_man_R_"), sg.Button("FRONT", key="_btn_man_F_"), 
@@ -374,17 +376,39 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 								"_btn_man_D_", "_btn_man_L_", "_btn_man_B_"	]):
 					move_mnl = event[len(event) - 2]
 					st_Curr = "MNL_SET"
+				if keyboard.is_pressed('U'):
+					move_mnl = "U"
+					st_Curr = "MNL_SET"
+				elif keyboard.is_pressed('R'):
+					move_mnl = "R"
+					st_Curr = "MNL_SET"
+				elif keyboard.is_pressed('F'):
+					move_mnl = "F"
+					st_Curr = "MNL_SET"
+				elif keyboard.is_pressed('D'):
+					move_mnl = "D"
+					st_Curr = "MNL_SET"
+				elif keyboard.is_pressed('L'):
+					move_mnl = "L"
+					st_Curr = "MNL_SET"
+				elif keyboard.is_pressed('B'):
+					move_mnl = "B"
+					st_Curr = "MNL_SET"
 
 			elif st_Curr == "MNL_SET":
-				print("Rotating face " + move_mnl)
-				dict_ls_mnl = {	"Forward": 1, "Double": 2, "Reverse": 3	}
-				mode_mnl = dict_ls_mnl[values["_ls_mnl_mode_"]]
-				for i in range(mode_mnl):
-					cube = scramble.moveFace(move_mnl, cube)
-				waveSine.audioInputSeq([(move_mnl, mode_mnl)])
-				drawCubelets(window, cube)
-				window.refresh()
-				st_Curr = "MNL_GET"
+				if (st_Curr != st_Prev): # Should come from "MOVES_GET_CAM" or "MOVES_GET_ASC"
+					print("Rotating face " + move_mnl)
+					dict_ls_mnl = {	"Forward": 1, "Double": 2, "Reverse": 3	}
+					mode_mnl = dict_ls_mnl[values["_ls_mnl_mode_"]]
+					for i in range(mode_mnl):
+						cube = scramble.moveFace(move_mnl, cube)
+					waveSine.audioInputSeq([(move_mnl, mode_mnl)])
+					drawCubelets(window, cube)
+					window.refresh()
+					st_Prev = st_Curr
+				if (keyboard.is_pressed('U') == False) and (keyboard.is_pressed('R') == False)  and (keyboard.is_pressed('F') == False)  and (keyboard.is_pressed('D') == False)  and (keyboard.is_pressed('L') == False)  and (keyboard.is_pressed('B') == False) :
+					#print("potato")
+					st_Curr = "MNL_GET"
 			
 			## ------------------------------------------------------------------------
 			else: # Given invalid state
