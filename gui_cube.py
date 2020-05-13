@@ -79,7 +79,7 @@ def windowDefine():
 								],
 							]
 	frame_in_manual = [	[	sg.Radio("Manual Movement Input", "Radio_Input", key="_radio_manual_"),
-							sg.Text("Or use URFDLB keysrfedgfhjgkjun")
+							sg.Text("Alternatively use URFDLB keys")
 							],
 						# Buttons to control face to rotate & drop-down list to select direction/mode
 						[	sg.Button("UP", key="_btn_man_U_"), sg.Button("RIGHT", key="_btn_man_R_"), sg.Button("FRONT", key="_btn_man_F_"), 
@@ -184,6 +184,8 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 			## ------------------------------------------------------------------------
 			## Concerns camera-related inputs
 			if st_Curr == "CAM_IDLE":
+				if (st_Curr != st_Prev):
+					print("Visual input mode selected")
 				st_Prev = st_Curr
 				window["_btn_inputCam_"].update(disabled=False)
 				window["frame_raw_0"].update(data=None)
@@ -198,6 +200,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 			elif st_Curr == "CAM_GET": # State: Runs cameras & obtains pictures
 				try:
 					if (st_Curr != st_Prev): # Should come from "INIT"
+						print("Turning cameras on")
 						window["_btn_inputCam_"].update(disabled=False)
 						#window["_btn_confirmCam_"].update(disabled=False)
 						#window["_textRunCam_"].update("Press [CONFIRM] to confirm camera input")
@@ -224,9 +227,11 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 					st_Curr = "X"
 			###	Given camera confirmation, obtains cubelets from such images
 			elif st_Curr == "CAM_SET":
+				print("Camera image confirmed")
 				window["_btn_inputCam_"].update(disabled=True)
 				getColor.cam_releaseCap(cap_0, cap_1) # Releases OCV once done
 				cubelets = initCam.cam_obtainCubelets(result_combined, result_color)
+				print("Cube colour obtained: ")
 				getNew.printCube(cubelets)
 				# Convert colour notation to face notation
 				cube = cubeSolve.convertColorToFace(cubelets) # getNew.obtainVirCube(50) # Debug purposes - generates new cube
@@ -234,15 +239,23 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 				st_Curr = "MOVES_GET_CAM"
 			###	Given cube parsed from images, evaluates moves from camera
 			elif st_Curr == "MOVES_GET_CAM":
-				ls_kocSolve, str_kocSolve = cubeSolve.solveCubeKoc(cubeSolve.parseCubeString(cube))
-				ls_runMoves, str_runMoves = ls_kocSolve, str_kocSolve
-				print(ls_runMoves)
-				getNew.printCube(cube)
-				st_Curr = "MOVES_SET"
+				try:
+					ls_kocSolve, str_kocSolve = cubeSolve.solveCubeKoc(cubeSolve.parseCubeString(cube))
+					ls_runMoves, str_runMoves = ls_kocSolve, str_kocSolve
+					#print(ls_runMoves)
+					getNew.printCube(cube)
+					st_Curr = "MOVES_SET"
+				except: 
+					sg.PopupError(	"Unable to obtain colours of tiles.", 
+									"Check that colours of all tiles can be read.", 
+									title="Colour Read Error"	)
+					st_Curr = "X"
+				
 
 			## ------------------------------------------------------------------------
 			### Refers to ASCII-related inputs
 			elif st_Curr == "ASC_IDLE":
+				print("ASCII file input mode selected")
 				st_Prev = st_Curr
 				window["frame_raw_0"].update(data=None)
 				window["frame_raw_1"].update(data=None)
@@ -261,6 +274,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 				if values["_radio_cam_"] or values["_radio_manual_"]:
 					st_Curr = "INIT"
 			elif st_Curr == "ASC_SET":
+				print("ASCII file directory obtained")
 				st_Prev = st_Curr
 				window["_btn_confirmFile_"].update(disabled=True)
 				window["_btn_inputFile_"].update(disabled=True)
@@ -275,6 +289,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 									title="Invalid File")
 					st_Curr = "X"
 			elif st_Curr == "MOVES_GET_ASC":
+				print("File read successful")
 				st_Prev = st_Curr
 				str_ascii, bl_asciiValid = getAscii.returnParsedStr(str_Mixup) # Test list of moves
 				if bl_asciiValid == True:
@@ -293,6 +308,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 			###	Given set of moves, prep program to run moves, including simulation
 			elif st_Curr == "MOVES_SET":
 				if (st_Curr != st_Prev): # Should come from "MOVES_GET_CAM" or "MOVES_GET_ASC"
+					print("Moves obtained")
 					window["_radio_ascii_"].update(disabled=True)
 					window["_radio_cam_"].update(disabled=True)
 					window["_radio_manual_"].update(disabled=True)
@@ -329,6 +345,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 
 			###	Given user confirmation to run moves, runs such moves
 			elif st_Curr == "MOVES_RUN":
+				print("Beginning audio output of " + str(len(ls_runMoves)) + " moves")
 				window["_slide_movesProgress_"].update(disabled=True)
 				window["_btn_solve_"].update(disabled=True)
 				drawCubelets(window, cube)
@@ -352,12 +369,14 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 
 			### Given move completion, affirm with completion message
 			elif st_Curr == "DONE":
+				print("Audio output complete")
 				sg.Popup("Operation completed.", title="Completed")
 				st_Curr = "INIT"
 			
 			## ------------------------------------------------------------------------
 			# Given manual input mode selected
 			elif st_Curr == "MNL_IDLE":
+				print("Manual Input mode selected")
 				window["_btn_man_U_"].update(disabled=False)
 				window["_btn_man_R_"].update(disabled=False)
 				window["_btn_man_F_"].update(disabled=False)
@@ -365,6 +384,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 				window["_btn_man_L_"].update(disabled=False)
 				window["_btn_man_B_"].update(disabled=False)
 				window["_ls_mnl_mode_"].update(disabled=False)
+				window["_ls_mnl_mode_"].update(readonly=True)
 				cube = getNew.obtainVirCube() # Generates default virtual cube to display movement
 				drawCubelets(window, cube)
 				st_Curr = "MNL_GET"
@@ -377,21 +397,27 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 					move_mnl = event[len(event) - 2]
 					st_Curr = "MNL_SET"
 				if keyboard.is_pressed('U'):
+					print("Key pressed: U")
 					move_mnl = "U"
 					st_Curr = "MNL_SET"
 				elif keyboard.is_pressed('R'):
+					print("Key pressed: R")
 					move_mnl = "R"
 					st_Curr = "MNL_SET"
 				elif keyboard.is_pressed('F'):
+					print("Key pressed: F")
 					move_mnl = "F"
 					st_Curr = "MNL_SET"
 				elif keyboard.is_pressed('D'):
+					print("Key pressed: D")
 					move_mnl = "D"
 					st_Curr = "MNL_SET"
 				elif keyboard.is_pressed('L'):
+					print("Key pressed: L")
 					move_mnl = "L"
 					st_Curr = "MNL_SET"
 				elif keyboard.is_pressed('B'):
+					print("Key pressed: B")
 					move_mnl = "B"
 					st_Curr = "MNL_SET"
 
@@ -399,6 +425,7 @@ if __name__ == "__main__": # Implements each stage of GUI progression with state
 				if (st_Curr != st_Prev): # Should come from "MOVES_GET_CAM" or "MOVES_GET_ASC"
 					print("Rotating face " + move_mnl)
 					dict_ls_mnl = {	"Forward": 1, "Double": 2, "Reverse": 3	}
+					print(values["_ls_mnl_mode_"])
 					mode_mnl = dict_ls_mnl[values["_ls_mnl_mode_"]]
 					for i in range(mode_mnl):
 						cube = scramble.moveFace(move_mnl, cube)
